@@ -36,18 +36,14 @@ const renderLine = (x0: number, y0: number, x1: number, y1: number, imageData: I
     let deltaErr = deltaY / deltaX;
     let y = y0;
     const plot = (x: number, y: number) => {
-
         x += (width / 2) | 0;
         y += (height / 2) | 0
-        let index = (y | 0) * width + (x | 0);
-        data[index] = 0;
-        data[index + 1] = 0;
-        data[index + 2] = 0;
+        let index = ((y | 0) * width + (x | 0)) * 4;
         data[index + 3] = 255;
     }
     for (let x = x0; x < x1; x++) {
-
         plot(x, y)
+        // dda 数字微分
         error += deltaErr;
         if (Math.abs(error) >= 0.5) {
             y += 1;
