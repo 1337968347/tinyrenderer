@@ -1,14 +1,19 @@
-import { renderLine } from "../src/geometry"
+import { renderLine, renderCoor } from '../src/geometry';
 
-const canvasEl = document.querySelector("canvas") || document.createElement('canvas')
-canvasEl.width = 500;
-canvasEl.height = 500;
+const width = 500;
+const height = 500;
+const canvasEl = document.querySelector('canvas') || document.createElement('canvas');
+canvasEl.width = width;
+canvasEl.height = height;
 
-const ctx = canvasEl.getContext('2d')
-const imageData = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height)
+const ctx = canvasEl.getContext('2d');
+renderCoor(ctx, width, height);
+const imageData = ctx.getImageData(0, 0, width, height);
 
-renderLine(0, 0, 200, 200, imageData)
-// ctx.moveTo(0,0)
-// ctx.lineTo(200, 200)
-// ctx.stroke()
-ctx.putImageData(imageData, 0, 0)
+renderLine(0, 0, -200, 200, imageData);
+renderLine(0, 0, 200, 200, imageData);
+renderLine(0, 0, 200, -200, imageData);
+renderLine(0, 0, -200, -200, imageData);
+renderLine(0, 0, 0, -200, imageData);
+
+ctx.putImageData(imageData, 0, 0);
