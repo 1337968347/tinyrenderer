@@ -1,5 +1,18 @@
 import { coor2index } from './index';
 
+// 三角形
+class Trangle {
+  /**
+   *
+   * @param points: { x: number; y: number }[3]
+   */
+  constructor(points) {
+    this.points = points;
+  }
+
+  points: { x: number; y: number }[];
+}
+
 /**
  * 当前光栅化的点是否在三角形内部
  * @param p 当前光栅化的点
@@ -47,4 +60,5 @@ const rasterize_Triangle = (points, imageData: ImageData) => {
     }
   }
 };
-export { rasterize_Triangle };
+
+export { rasterize_Triangle, Trangle, inside_Triangle };
