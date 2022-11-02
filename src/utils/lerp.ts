@@ -7,7 +7,7 @@ const lerp = (v1: Vector, v2: Vector, a: number) => {
 };
 
 // 两点之间平滑插值
-const lerpSmooth = (v1: Vector, v2: Vector, a: number) => { };
+// const lerpSmooth = (v1: Vector, v2: Vector, a: number) => { };
 
 // 三角形之间根据uv坐标插值
 const lerpTriangle = (v1: Vector, v2: Vector, v3: Vector, u: number, v: number) => {
@@ -16,4 +16,4 @@ const lerpTriangle = (v1: Vector, v2: Vector, v3: Vector, u: number, v: number) 
     return v1.multiplyN(1 - u - v).add(v2.multiplyN(u)).add(v3.multiplyN(v))
 };
 
-export { lerp, lerpSmooth, lerpTriangle };
+export { lerp, lerpTriangle };
