@@ -3,17 +3,18 @@ import { mat4, vec3 } from 'gl-matrix';
 
 // 图元
 type attributeProps = { [key: string]: vec3[] };
+type attributeProp = { [key: string]: vec3 };
 type uniformsProps = { [key: string]: vec3 | number | mat4 };
 
 /**
- * 提供顶点变换功能
+ * 顶点变换管线
  * @param attribute attributeProps
  * @param uniforms uniformsProps
  * @param varying
  * @param vertShaderHandle
  * @returns
  */
-const vertShader = (attributes: attributeProps, uniforms: uniformsProps, vertShader) => {
+const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertShader) => {
   const { position } = attributes;
   const vertLen = position.length;
   const attribute = {};
@@ -36,4 +37,28 @@ const vertShader = (attributes: attributeProps, uniforms: uniformsProps, vertSha
   return { varyings, gl_positions };
 };
 
-export { vertShader };
+/**
+ * 顶点变换 着色器
+ * @param attribute
+ * @param uniforms
+ */
+const vertShader = (attribute: attributeProp, uniforms: uniformsProps) => {
+  const { position, normal } = attribute;
+  const { modelMatrix, projectionMatrix } = uniforms;
+  // 世界坐标
+  const vWorldPosition = vec3.create();
+  // 法线
+  const vNormal = vec3.create();
+  // 标准投影空间的坐标
+  const gl_position = vec3.create();
+
+  vec3.transformMat4(vNormal, normal, modelMatrix as mat4);
+  vec3.transformMat4(vWorldPosition, position, modelMatrix as mat4);
+  vec3.transformMat4(gl_position, vWorldPosition, projectionMatrix as mat4);
+
+  // 传递给片元着色器的参数
+  const varyings = { vWorldPosition, vNormal };
+  return { gl_position, varyings };
+};
+
+export { vertPipeline, vertShader };
