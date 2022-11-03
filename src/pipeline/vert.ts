@@ -12,7 +12,7 @@ type uniformsProps = { [key: string]: vec3 | number | mat4 };
  * @param uniforms uniformsProps
  * @param varying
  * @param vertShaderHandle
- * @returns
+ * @returns {varyings, gl_positions}
  */
 const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertShader) => {
   const { position } = attributes;
