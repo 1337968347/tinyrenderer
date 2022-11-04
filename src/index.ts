@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix';
 import { createCanvasRenderingContext2D, getPosAndNormal } from './utils';
-import { vertPipeline, vertShader, trangleMake } from './pipeline';
+import { vertPipeline, vertShader, trangleMakePipeline } from './pipeline';
 import { bunnyStr } from './assets/bunny-obj';
 
 const width = 500;
@@ -17,8 +17,7 @@ const uniforms = { modelMatrix, projectionMatrix };
 // 顶点着色器
 const { varyings, gl_positions } = vertPipeline(attributes, uniforms, vertShader);
 // 图元组装
-const primitiveData = trangleMake(varyings);
-
+const primitiveData = trangleMakePipeline(varyings);
 
 console.log(varyings, gl_positions, primitiveData);
 const imageData = ctx.getImageData(0, 0, width, height);
