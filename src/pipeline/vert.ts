@@ -16,10 +16,15 @@ type uniformsProps = { [key: string]: vec3 | number | mat4 };
  */
 const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertShader) => {
   const { position } = attributes;
+  if (position.length < 3) throw new Error('顶点数太少');
+
   const vertLen = position.length;
   const attribute = {};
   // 逐顶点计算的数据
-  const varyings = [];
+  const varyings = {
+    vWorldPosition: [],
+    vNormal: [],
+  };
   // 用来做后面裁剪，光栅化深度测试用的顶点位置数据
   const gl_positions = [];
 
@@ -29,8 +34,7 @@ const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertS
     for (let key in attributes) {
       attribute[key] = vec3.clone(attributes[key][i]);
     }
-    const { varying, gl_position } = vertShader(attribute, uniforms);
-    varyings.push(varying);
+    const { gl_position } = vertShader(attribute, uniforms, varyings);
     gl_positions.push(gl_position);
   }
 
@@ -42,7 +46,7 @@ const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertS
  * @param attribute
  * @param uniforms
  */
-const vertShader = (attribute: attributeProp, uniforms: uniformsProps) => {
+const vertShader = (attribute: attributeProp, uniforms: uniformsProps, varyings: Object) => {
   const { position, normal } = attribute;
   const { modelMatrix, projectionMatrix } = uniforms;
   // 世界坐标
@@ -57,8 +61,10 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProps) => {
   vec3.transformMat4(gl_position, vWorldPosition, projectionMatrix as mat4);
 
   // 传递给片元着色器的参数
-  const varyings = { vWorldPosition, vNormal };
-  return { gl_position, varyings };
+  varyings['vNormal'].push(vNormal);
+  varyings['vWorldPosition'].push(vWorldPosition);
+
+  return { gl_position };
 };
 
 export { vertPipeline, vertShader };

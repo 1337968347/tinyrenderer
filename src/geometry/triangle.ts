@@ -4,13 +4,13 @@ import { coor2index } from './index';
 class Trangle {
   /**
    *
-   * @param points: { x: number; y: number }[3]
+   * @param points: Float32Array[3]
    */
   constructor(points) {
     this.points = points;
   }
 
-  points: { x: number; y: number }[];
+  points: Float32Array[];
 }
 
 /**
