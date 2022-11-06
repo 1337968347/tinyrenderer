@@ -12,7 +12,7 @@ const ctx = createCanvasRenderingContext2D({ width, height });
 const attributes = getPosAndNormal(bunnyStr);
 // 模型变换矩阵
 const modelMatrix = mat4.identity(mat4.create());
-mat4.scale(modelMatrix, modelMatrix, vec3.clone([15, 15, 15]));
+mat4.scale(modelMatrix, modelMatrix, vec3.clone([10, 10, 10]));
 // 投影矩阵
 const projectionMatrix = mat4.identity(mat4.create());
 const uniforms = { modelMatrix, projectionMatrix };
