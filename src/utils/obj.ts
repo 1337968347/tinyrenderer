@@ -1,4 +1,4 @@
-import { vec3, mat4 } from 'gl-matrix';
+import { vec3 } from 'gl-matrix';
 
 // 解析Obj格式
 export const parseObj = text => {

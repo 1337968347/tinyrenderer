@@ -1,4 +1,3 @@
-import { Vector } from '../geometry/vector';
 import { mat4, vec3 } from 'gl-matrix';
 
 // 图元
@@ -26,7 +25,7 @@ const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertS
     vNormal: [],
   };
   // 用来做后面裁剪，光栅化深度测试用的顶点位置数据
-  const gl_positions = [];
+  const gl_positions: vec3[] = [];
 
   // 逐顶点处理
   for (let i = 0; i < vertLen; i++) {
