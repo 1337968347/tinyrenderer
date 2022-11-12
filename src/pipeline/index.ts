@@ -4,3 +4,5 @@ export { vertPipeline, vertShader } from './vert';
 export { trangleMakePipeline } from './primitive';
 // 裁剪处理
 export { croppingPipeline } from './cull';
+// 光栅化
+export { rasterizationPipeline } from './rasterization';

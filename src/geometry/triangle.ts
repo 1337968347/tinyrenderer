@@ -1,4 +1,4 @@
-import { coor2index } from './index';
+import { vec2, vec3 } from 'gl-matrix';
 
 // 三角形
 class Trangle {
@@ -6,59 +6,65 @@ class Trangle {
    *
    * @param points: Float32Array[3]
    */
-  constructor(points) {
+  constructor(points: vec3[]) {
     this.points = points;
   }
 
-  points: Float32Array[];
+  points: vec3[];
 }
 
+// /**
+//  * 当前光栅化的点是否在三角形内部
+//  * 同向法
+//  * @param p 当前光栅化的点
+//  * @param points 三角形的三个点
+//  */
+// const inside_Triangle = (p, points) => {
+//   const [a, b, c] = points;
+
+//   const ap = { x: p.x - a.x, y: p.y - a.y };
+//   const bp = { x: p.x - b.x, y: p.y - b.y };
+//   const cp = { x: p.x - c.x, y: p.y - c.y };
+
+//   const ba = { x: a.x - b.x, y: a.y - b.y };
+//   const ac = { x: c.x - a.x, y: c.y - a.y };
+//   const cb = { x: b.x - c.x, y: b.y - c.y };
+
+//   const z1 = ap.x * ba.y - ap.y * ba.x;
+//   const z2 = cp.x * ac.y - cp.y * ac.x;
+//   const z3 = bp.x * cb.y - bp.y * cb.x;
+
+//   if ((z1 > 0 && z2 > 0 && z3 > 0) || (z1 < 0 && z2 < 0 && z3 < 0)) {
+//     return true;
+//   }
+//   return false;
+// };
+
 /**
- * 当前光栅化的点是否在三角形内部
- * @param p 当前光栅化的点
- * @param points 三角形的三个点
+ * 获取点p在三角形中的重心坐标
+ * @param trangle 三角形
+ * @param p 三角形平面内一点p
  */
-const inside_Triangle = (p, points) => {
-  const [a, b, c] = points;
-
-  const ap = { x: p.x - a.x, y: p.y - a.y };
-  const bp = { x: p.x - b.x, y: p.y - b.y };
-  const cp = { x: p.x - c.x, y: p.y - c.y };
-
-  const ba = { x: a.x - b.x, y: a.y - b.y };
-  const ac = { x: c.x - a.x, y: c.y - a.y };
-  const cb = { x: b.x - c.x, y: b.y - c.y };
-
-  const z1 = ap.x * ba.y - ap.y * ba.x;
-  const z2 = cp.x * ac.y - cp.y * ac.x;
-  const z3 = bp.x * cb.y - bp.y * cb.x;
-
-  if ((z1 > 0 && z2 > 0 && z3 > 0) || (z1 < 0 && z2 < 0 && z3 < 0)) {
-    return true;
-  }
-  return false;
+const getUV = (trangle: Trangle, p: vec3) => {
+  const [A, B, C] = trangle.points;
+  const AP = { x: p[0] - A[0], y: p[1] - A[1] };
+  const AB = { x: B[0] - A[0], y: B[1] - A[1] };
+  const AC = { x: C[0] - A[0], y: C[1] - A[1] };
+  // 重心坐标 AP = u * AB + v* AC;
+  return {
+    u: (AP.x * AB.y - AB.x * AP.y) / (AC.x * AB.y - AB.x * AC.y),
+    v: (AP.x * AC.y - AC.x * AP.y) / (AB.x * AC.y - AC.x * AB.y),
+  };
 };
 
 /**
- * 光栅化三角形
- * @param points {x: number, y: number}[3]
- * @param imageData
+ * 顶点p 是否在三角形内
+ * @param trangle
+ * @param p
  */
-const rasterize_Triangle = (points, imageData: ImageData) => {
-  const [a, b, c] = points;
-  const { width, height, data } = imageData;
-  const minX = Math.min(a.x, b.x, c.x, 0);
-  const maxX = Math.max(a.x, b.x, c.x);
-  const minY = Math.min(a.y, b.y, c.y);
-  const maxY = Math.max(a.y, b.y, c.y);
-  for (let y = minY; y < maxY; y++) {
-    for (let x = minX; x < maxX; x++) {
-      const p = { x: x + 0.5, y: y + 0.5 };
-      if (inside_Triangle(p, points)) {
-        data[coor2index(x, y, width, height) + 3] = 200;
-      }
-    }
-  }
+const inside_Triangle = (trangle: Trangle, p: vec3) => {
+  const { u, v } = getUV(trangle, p);
+  return { u, v, inside: 0 <= u && u <= 1 && v >= 0 && v <= 1 };
 };
 
-export { rasterize_Triangle, Trangle, inside_Triangle };
+export { Trangle, inside_Triangle };
