@@ -6,3 +6,5 @@ export { trangleMakePipeline } from './primitive';
 export { croppingPipeline } from './cull';
 // 光栅化
 export { rasterizationPipeline } from './rasterization';
+// 片元着色器
+export { fragPipeline } from './frag';
