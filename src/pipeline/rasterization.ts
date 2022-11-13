@@ -37,11 +37,8 @@ const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => 
   for (let y = minY | 0; y < maxY; y++) {
     for (let x = minX | 0; x < maxX; x++) {
       // 加0.5 避免顶点取到三角形上
-      const { u, v, inside } = inside_Triangle(pixTrangle, [x + 0.5, y + 0.5, 0]);
+      const { u, v, inside } = inside_Triangle(pixTrangle, [x , y, 0]);
       if (inside) {
-        if (x < 0 || x > 512 || y < 0 || y > 512) {
-          debugger;
-        }
         trangleFragments.push({
           x,
           y,

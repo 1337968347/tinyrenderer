@@ -5,7 +5,7 @@ const fragPipeline = (fragmentData: FragmentData[], imageData: ImageData, width:
     const fragmentItem = fragmentData[i];
     if (!fragmentItem.isHit) continue;
     const { x, y } = fragmentItem;
-    imageData.data[y * width + x * 4 + 3] = 255;
+    imageData.data[(height - y) * width + x * 4 + 3] = 255;
   }
   return imageData;
 };
