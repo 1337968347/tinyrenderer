@@ -1,4 +1,4 @@
-import { vec2, vec3 } from 'gl-matrix';
+import { vec3 } from 'gl-matrix';
 
 // 三角形
 class Trangle {
@@ -58,6 +58,20 @@ const getUV = (trangle: Trangle, p: vec3) => {
 };
 
 /**
+ * 根据三角形的顶点 以及U V值插值三角形
+ * @param trangle
+ * @param u
+ * @param v
+ * @return vec3
+ */
+const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
+  const [A, B, C] = trangle.points;
+  const AB = { x: B[0] - A[0], y: B[1] - A[1], z: B[2] - A[2] };
+  const AC = { x: C[0] - A[0], y: C[1] - A[1], z: C[2] - A[2] };
+  return vec3.clone([u * AB.x + v * AC.x, u * AB.y + v * AC.y, u * AB.z + v * AC.z]);
+};
+
+/**
  * 顶点p 是否在三角形内
  * @param trangle
  * @param p
@@ -67,4 +81,4 @@ const inside_Triangle = (trangle: Trangle, p: vec3) => {
   return { u, v, inside: 0 <= u && u <= 1 && v >= 0 && v <= 1 };
 };
 
-export { Trangle, inside_Triangle };
+export { Trangle, inside_Triangle, lerp_Triangle_UV, getUV };
