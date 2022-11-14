@@ -26,7 +26,6 @@ const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertS
   };
   // 用来做后面裁剪，光栅化深度测试用的顶点位置数据
   const gl_positions: vec3[] = [];
-
   // 逐顶点处理
   for (let i = 0; i < vertLen; i++) {
     // 复制当前顶点

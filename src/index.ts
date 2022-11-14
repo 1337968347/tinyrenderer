@@ -5,7 +5,7 @@ import { bunnyStr } from './assets/bunny-obj';
 
 const WIDTH = 512;
 const HEIGHT = 512;
-console.time('render')
+console.time('render');
 
 const ctx = createCanvasRenderingContext2D({ width: WIDTH, height: HEIGHT });
 // renderCoor(ctx, width, height);
@@ -13,7 +13,7 @@ const ctx = createCanvasRenderingContext2D({ width: WIDTH, height: HEIGHT });
 const attributes = getPosAndNormal(bunnyStr);
 // 模型变换矩阵
 const modelMatrix = mat4.identity(mat4.create());
-mat4.scale(modelMatrix, modelMatrix, vec3.clone([1.5, 1.5, 1.5]));
+mat4.scale(modelMatrix, modelMatrix, vec3.clone([3, 3, 3]));
 // 投影矩阵
 const projectionMatrix = mat4.identity(mat4.create());
 const uniforms = { modelMatrix, projectionMatrix };
@@ -23,9 +23,11 @@ const { varyings, gl_positions } = vertPipeline(attributes, uniforms, vertShader
 const { primitiveVaryingData, primitiveGlPosition } = trangleMakePipeline(varyings, gl_positions);
 // 裁剪处理 (背面剔除, 视锥体剔除)
 const { cropped_PrimitiveData, cropped_Gl_Positions } = croppingPipeline(primitiveVaryingData, primitiveGlPosition);
+
+console.log(cropped_Gl_Positions)
 // 光栅化（图元数据 => 片元数据）
 const fragmentData = rasterizationPipeline(cropped_PrimitiveData, cropped_Gl_Positions, WIDTH, HEIGHT);
 const imageData = fragPipeline(fragmentData, ctx.getImageData(0, 0, WIDTH, HEIGHT), WIDTH, HEIGHT);
 
 ctx.putImageData(imageData, 0, 0);
-console.timeEnd('render')
+console.timeEnd('render');

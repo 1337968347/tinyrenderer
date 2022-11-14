@@ -33,12 +33,14 @@ const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => 
   const maxX = clamp(minX, Math.max(A[0], B[0], C[0]), width);
   const minY = clamp(0, Math.min(A[1], B[1], C[1]), height);
   const maxY = clamp(minY, Math.max(A[1], B[1], C[1]), height);
+ 
   const pixTrangle = new Trangle([A, B, C]);
   for (let y = minY | 0; y < maxY; y++) {
     for (let x = minX | 0; x < maxX; x++) {
       // 加0.5 避免顶点取到三角形上
-      const { u, v, inside } = inside_Triangle(pixTrangle, [x , y, 0]);
+      const { u, v, inside } = inside_Triangle(pixTrangle, [x, y, 0]);
       if (inside) {
+        
         trangleFragments.push({
           x,
           y,

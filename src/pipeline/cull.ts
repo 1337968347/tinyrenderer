@@ -3,7 +3,7 @@ import { Trangle, BBox } from '../geometry';
 
 // 视锥体剔除  背面剔除
 const croppingPipeline = (primitiveData: { [key: string]: Trangle[] }, gl_positions: Trangle[]) => {
-  const bbox = new BBox([vec3.clone([-1, -1, -1]), vec3.clone([1, 1, 1])]);
+  const bbox = new BBox([vec3.clone([-0.5, -0.5, -0.5]), vec3.clone([0.5, 0.5, 0.5])]);
   // 通过裁剪流水线的数据
   const cropped_PrimitiveData: { [key: string]: Trangle[] } = {};
   const cropped_Gl_Positions: Trangle[] = [];
