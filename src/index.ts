@@ -13,7 +13,8 @@ const ctx = createCanvasRenderingContext2D({ width: WIDTH, height: HEIGHT });
 const attributes = getPosAndNormal(bunnyStr);
 // 模型变换矩阵
 const modelMatrix = mat4.identity(mat4.create());
-mat4.scale(modelMatrix, modelMatrix, vec3.clone([3, 3, 3]));
+mat4.translate(modelMatrix, modelMatrix, [0, 0.0, 0.0]);
+mat4.scale(modelMatrix, modelMatrix, [2, 2, 2]);
 // 投影矩阵
 const projectionMatrix = mat4.identity(mat4.create());
 const uniforms = { modelMatrix, projectionMatrix };
@@ -24,7 +25,6 @@ const { primitiveVaryingData, primitiveGlPosition } = trangleMakePipeline(varyin
 // 裁剪处理 (背面剔除, 视锥体剔除)
 const { cropped_PrimitiveData, cropped_Gl_Positions } = croppingPipeline(primitiveVaryingData, primitiveGlPosition);
 
-console.log(cropped_Gl_Positions)
 // 光栅化（图元数据 => 片元数据）
 const fragmentData = rasterizationPipeline(cropped_PrimitiveData, cropped_Gl_Positions, WIDTH, HEIGHT);
 const imageData = fragPipeline(fragmentData, ctx.getImageData(0, 0, WIDTH, HEIGHT), WIDTH, HEIGHT);
