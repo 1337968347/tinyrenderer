@@ -66,9 +66,8 @@ const getUV = (trangle: Trangle, p: vec3) => {
  */
 const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
   const [A, B, C] = trangle.points;
-  const AB = { x: B[0] - A[0], y: B[1] - A[1], z: B[2] - A[2] };
-  const AC = { x: C[0] - A[0], y: C[1] - A[1], z: C[2] - A[2] };
-  return vec3.clone([u * AB.x + v * AC.x, u * AB.y + v * AC.y, u * AB.z + v * AC.z]);
+  const t = 1 - u - v;
+  return vec3.clone([t * C[0] + u * A[0] + v * B[0], t * C[1] + u * A[1] + v * B[1], t * C[2] + u * A[2] + v * B[2]]);
 };
 
 /**

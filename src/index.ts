@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { createCanvasRenderingContext2D, getPosAndNormal } from './utils';
 import { vertPipeline, vertShader, trangleMakePipeline, croppingPipeline, rasterizationPipeline, fragPipeline } from './pipeline';
 import { bunnyStr } from './assets/bunny-obj';
@@ -11,10 +11,11 @@ const ctx = createCanvasRenderingContext2D({ width: WIDTH, height: HEIGHT });
 // renderCoor(ctx, width, height);
 
 const attributes = getPosAndNormal(bunnyStr);
+debugger
 // 模型变换矩阵
 const modelMatrix = mat4.identity(mat4.create());
-mat4.translate(modelMatrix, modelMatrix, [0, 0.0, 0.0]);
-mat4.scale(modelMatrix, modelMatrix, [2, 2, 2]);
+mat4.translate(modelMatrix, modelMatrix, [0, -0.3, 0.0]);
+mat4.scale(modelMatrix, modelMatrix, [4, 4, 4]);
 // 投影矩阵
 const projectionMatrix = mat4.identity(mat4.create());
 const uniforms = { modelMatrix, projectionMatrix };
@@ -29,5 +30,6 @@ const { cropped_PrimitiveData, cropped_Gl_Positions } = croppingPipeline(primiti
 const fragmentData = rasterizationPipeline(cropped_PrimitiveData, cropped_Gl_Positions, WIDTH, HEIGHT);
 const imageData = fragPipeline(fragmentData, ctx.getImageData(0, 0, WIDTH, HEIGHT), WIDTH, HEIGHT);
 
+console.log(fragmentData)
 ctx.putImageData(imageData, 0, 0);
 console.timeEnd('render');

@@ -57,7 +57,6 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProps, varyings:
   vec3.transformMat4(vNormal, normal, modelMatrix as mat4);
   vec3.transformMat4(vWorldPosition, position, modelMatrix as mat4);
   vec3.transformMat4(gl_position, vWorldPosition, projectionMatrix as mat4);
-
   // 传递给片元着色器的参数
   varyings['vNormal'].push(vNormal);
   varyings['vWorldPosition'].push(vWorldPosition);
