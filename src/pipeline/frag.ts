@@ -7,7 +7,7 @@ const fragShader = (fragmentData: FragmentData): vec4 => {
   let { vNormal, vWorldPosition } = primitiveData;
   vec3.normalize(vNormal, vNormal);
   const diffuse = vec3.dot(vNormal, [0, -1, 0]);
-  gl_FragColor[3] = diffuse
+  gl_FragColor[3] = diffuse 
   vec4.scale(gl_FragColor, gl_FragColor, 255);
   return gl_FragColor;
 };

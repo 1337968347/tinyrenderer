@@ -8,10 +8,10 @@ const HEIGHT = 512;
 console.time('render');
 
 const ctx = createCanvasRenderingContext2D({ width: WIDTH, height: HEIGHT });
+ctx.fillRect(0, 0, WIDTH, HEIGHT);
 // renderCoor(ctx, width, height);
 
 const attributes = getPosAndNormal(bunnyStr);
-debugger
 // 模型变换矩阵
 const modelMatrix = mat4.identity(mat4.create());
 mat4.translate(modelMatrix, modelMatrix, [0, -0.3, 0.0]);
@@ -25,11 +25,10 @@ const { varyings, gl_positions } = vertPipeline(attributes, uniforms, vertShader
 const { primitiveVaryingData, primitiveGlPosition } = trangleMakePipeline(varyings, gl_positions);
 // 裁剪处理 (背面剔除, 视锥体剔除)
 const { cropped_PrimitiveData, cropped_Gl_Positions } = croppingPipeline(primitiveVaryingData, primitiveGlPosition);
-
 // 光栅化（图元数据 => 片元数据）
 const fragmentData = rasterizationPipeline(cropped_PrimitiveData, cropped_Gl_Positions, WIDTH, HEIGHT);
 const imageData = fragPipeline(fragmentData, ctx.getImageData(0, 0, WIDTH, HEIGHT), WIDTH, HEIGHT);
 
-console.log(fragmentData)
+console.log(fragmentData);
 ctx.putImageData(imageData, 0, 0);
 console.timeEnd('render');

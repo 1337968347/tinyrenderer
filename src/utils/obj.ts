@@ -85,6 +85,10 @@ const cross = (a, b) => {
     z: a.x * b.y - a.y * b.x,
   };
 };
+const normalize = a => {
+  const len = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+  return { x: a.x / len, y: a.y / len, z: a.z / len };
+};
 
 export const getPosAndNormal = text => {
   const { position } = parseObj(text);
@@ -105,7 +109,7 @@ export const getPosAndNormal = text => {
     };
     const a = { x: p2.x - p1.x, y: p2.y - p1.y, z: p2.z - p1.z };
     const b = { x: p1.x - p0.x, y: p1.y - p0.y, z: p1.z - p0.z };
-    const normal = cross(a, b);
+    const normal = normalize(cross(a, b));
     normals.push(normal.x);
     normals.push(normal.y);
     normals.push(normal.z);
