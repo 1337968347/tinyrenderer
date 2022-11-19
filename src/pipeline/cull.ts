@@ -41,7 +41,11 @@ const frustumCull = (gl_position: Trangle, bbox: BBox): boolean => {
 // 背面剔除
 const backCull = (gl_position: Trangle) => {
   const [a, b, c] = gl_position.points;
-  const z = a[0] * b[1] - a[1] * b[0];
+  const ax = b[0] - a[0];
+  const ay = b[1] - a[1];
+  const bx = c[0] - b[0];
+  const by = c[1] - b[1];
+  const z = ax * by - ay * bx;
   return z > 0;
 };
 
