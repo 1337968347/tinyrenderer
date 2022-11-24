@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { Vector4 } from 'three';
 import { inside_Triangle, Trangle, lerp_Triangle_UV } from '../geometry';
 
 const clamp = (min: number, n: number, max: number) => {
@@ -8,9 +8,9 @@ const clamp = (min: number, n: number, max: number) => {
 type FragmentData = {
   x: number;
   y: number;
-  pos: vec3;
+  pos: Vector4;
   isHit: boolean;
-  primitiveData: { [key: string]: vec3 };
+  primitiveData: { [key: string]: Vector4 };
 };
 /**
  * 光栅化三角形
@@ -25,20 +25,20 @@ const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => 
   const trangleFragments = [];
   const [a, b, c] = trangle.points;
   // 加 0.5把 [-0.5, -0.5] 映射到 [0, 1]
-  const A = vec3.clone([(a[0] + 0.5) * width, (a[1] + 0.5) * height, 0]);
-  const B = vec3.clone([(b[0] + 0.5) * width, (b[1] + 0.5) * height, 0]);
-  const C = vec3.clone([(c[0] + 0.5) * width, (c[1] + 0.5) * height, 0]);
+  const A = new Vector4((a.x + 0.5) * width, (a.y + 0.5) * height, 0, 1.0);
+  const B = new Vector4((b.x + 0.5) * width, (b.y + 0.5) * height, 0, 1.0);
+  const C = new Vector4((c.x + 0.5) * width, (c.y + 0.5) * height, 0, 1.0);
 
-  const minX = clamp(0, Math.min(A[0], B[0], C[0]), width);
-  const maxX = clamp(minX, Math.max(A[0], B[0], C[0]), width);
-  const minY = clamp(0, Math.min(A[1], B[1], C[1]), height);
-  const maxY = clamp(minY, Math.max(A[1], B[1], C[1]), height);
+  const minX = clamp(0, Math.min(A.x, B.x, C.x), width);
+  const maxX = clamp(minX, Math.max(A.x, B.x, C.x), width);
+  const minY = clamp(0, Math.min(A.y, B.y, C.y), height);
+  const maxY = clamp(minY, Math.max(A.y, B.y, C.y), height);
 
   const pixTrangle = new Trangle([A, B, C]);
   for (let y = minY | 0; y < maxY; y++) {
     for (let x = minX | 0; x < maxX; x++) {
       // 加0.5 避免顶点取到三角形上
-      const { u, v, inside } = inside_Triangle(pixTrangle, [x, y, 0]);
+      const { u, v, inside } = inside_Triangle(pixTrangle, new Vector4(x, y, 0, 1));
       if (inside) {
         trangleFragments.push({
           x,
@@ -62,7 +62,7 @@ const rasterizationPipeline = (primitiveData: { [key: string]: Trangle[] }, Gl_P
     for (let x = 0; x < width; x++) {
       FRAGMENTDATAS[y * width + x] = {
         primitiveData: {},
-        pos: vec3.clone([x, y, -Infinity]),
+        pos: new Vector4(x, y, -Infinity, 1.0),
         isHit: false,
         x,
         y,
@@ -83,7 +83,7 @@ const rasterizationPipeline = (primitiveData: { [key: string]: Trangle[] }, Gl_P
     for (let n = 0; n < triangleFragments.length; n++) {
       const temp = triangleFragments[n];
       const fragment = FRAGMENTDATAS[temp.y * width + temp.x];
-      if (temp.pos[2] > fragment.pos[2]) {
+      if (temp.pos.z > fragment.pos.z) {
         // const { u, v } = fragment;
         fragment.pos = temp.pos;
         fragment.primitiveData = {};

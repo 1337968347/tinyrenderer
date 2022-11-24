@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { Vector4 } from 'three';
 
 // 三角形
 class Trangle {
@@ -6,11 +6,11 @@ class Trangle {
    *
    * @param points: Float32Array[3]
    */
-  constructor(points: vec3[]) {
+  constructor(points: Vector4[]) {
     this.points = points;
   }
 
-  points: vec3[];
+  points: Vector4[];
 }
 
 // /**
@@ -45,11 +45,11 @@ class Trangle {
  * @param trangle 三角形
  * @param p 三角形平面内一点p
  */
-const getUV = (trangle: Trangle, p: vec3) => {
+const getUV = (trangle: Trangle, p: Vector4) => {
   const [A, B, C] = trangle.points;
-  const AP = { x: p[0] - A[0], y: p[1] - A[1] };
-  const AB = { x: B[0] - A[0], y: B[1] - A[1] };
-  const AC = { x: C[0] - A[0], y: C[1] - A[1] };
+  const AP = { x: p.x - A.x, y: p.y - A.y };
+  const AB = { x: B.x - A.x, y: B.y - A.y };
+  const AC = { x: C.x - A.x, y: C.y - A.y };
   // 重心坐标 AP = u * AB + v* AC;
   return {
     u: (AP.x * AB.y - AB.x * AP.y) / (AC.x * AB.y - AB.x * AC.y),
@@ -62,12 +62,12 @@ const getUV = (trangle: Trangle, p: vec3) => {
  * @param trangle
  * @param u
  * @param v
- * @return vec3
+ * @return {Vector4}
  */
 const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
   const [A, B, C] = trangle.points;
   const t = 1 - u - v;
-  return vec3.clone([t * C[0] + u * A[0] + v * B[0], t * C[1] + u * A[1] + v * B[1], t * C[2] + u * A[2] + v * B[2]]);
+  return new Vector4(t * C.x + u * A.x + v * B.x, t * C.y + u * A.y + v * B.y, t * C.z + u * A.z + v * B.z, t * C.w + u * A.w + v * B.w);
 };
 
 /**
@@ -75,7 +75,7 @@ const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
  * @param trangle
  * @param p
  */
-const inside_Triangle = (trangle: Trangle, p: vec3) => {
+const inside_Triangle = (trangle: Trangle, p: Vector4) => {
   const { u, v } = getUV(trangle, p);
   return { u, v, inside: 0 <= u && u <= 1 && v >= 0 && v <= 1 };
 };

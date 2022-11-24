@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { Matrix4 } from 'three';
 import { createCanvasRenderingContext2D, getPosAndNormal } from './utils';
 import { vertPipeline, vertShader, trangleMakePipeline, croppingPipeline, rasterizationPipeline, fragPipeline } from './pipeline';
 import { bunnyStr } from './assets/bunny-obj';
@@ -13,11 +13,10 @@ ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
 const attributes = getPosAndNormal(bunnyStr);
 // 模型变换矩阵
-const modelMatrix = mat4.identity(mat4.create());
-mat4.translate(modelMatrix, modelMatrix, [0, -0.3, 0.0]);
-mat4.scale(modelMatrix, modelMatrix, [4, 4, 4]);
+const modelMatrix = new Matrix4().makeTranslation(0, -0.3, 0.0);
+modelMatrix.multiply(new Matrix4().makeScale(4, 4, 4));
 // 投影矩阵
-const projectionMatrix = mat4.identity(mat4.create());
+const projectionMatrix = new Matrix4().identity()
 const uniforms = { modelMatrix, projectionMatrix };
 // 顶点着色器
 const { varyings, gl_positions } = vertPipeline(attributes, uniforms, vertShader);

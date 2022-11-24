@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { Vector4 } from 'three';
 
 // 解析Obj格式
 export const parseObj = text => {
@@ -124,8 +124,8 @@ export const getPosAndNormal = text => {
   const positionVec3 = [];
   const normalVec3 = [];
   for (let i = 0; i < position.length; i += 3) {
-    const posVec3 = vec3.clone([position[i], position[i + 1], position[i + 2]]);
-    const norVec3 = vec3.clone([normals[i], normals[i + 1], normals[i + 2]]);
+    const posVec3 = new Vector4(position[i], position[i + 1], position[i + 2], 1);
+    const norVec3 = new Vector4(normals[i], normals[i + 1], normals[i + 2], 1.0);
     positionVec3.push(posVec3);
     normalVec3.push(norVec3);
   }

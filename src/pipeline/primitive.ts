@@ -1,8 +1,8 @@
-import { vec3 } from 'gl-matrix';
+import { Vector4 } from 'three';
 import { Trangle } from '../geometry';
 
 // 图元组装
-const trangleMakePipeline = (attribute: { [key: string]: vec3[] }, gl_positions: vec3[]) => {
+const trangleMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
   const primitiveVaryingData: { [key: string]: Trangle[] } = {};
   const primitiveGlPosition: Trangle[] = [];
   for (let key in attribute) {

@@ -1,9 +1,9 @@
-import { vec3 } from 'gl-matrix';
+import { Vector3 } from 'three';
 import { Trangle, BBox } from '../geometry';
 
 // 视锥体剔除  背面剔除
 const croppingPipeline = (primitiveData: { [key: string]: Trangle[] }, gl_positions: Trangle[]) => {
-  const bbox = new BBox([vec3.clone([-0.5, -0.5, -0.5]), vec3.clone([0.5, 0.5, 0.5])]);
+  const bbox = new BBox([new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, 0.5, 0.5)]);
   // 通过裁剪流水线的数据
   const cropped_PrimitiveData: { [key: string]: Trangle[] } = {};
   const cropped_Gl_Positions: Trangle[] = [];
@@ -41,10 +41,10 @@ const frustumCull = (gl_position: Trangle, bbox: BBox): boolean => {
 // 背面剔除
 const backCull = (gl_position: Trangle) => {
   const [a, b, c] = gl_position.points;
-  const ax = b[0] - a[0];
-  const ay = b[1] - a[1];
-  const bx = c[0] - b[0];
-  const by = c[1] - b[1];
+  const ax = b.x - a.x;
+  const ay = b.y - a.y;
+  const bx = c.x - b.x;
+  const by = c.y - b.y;
   const z = ax * by - ay * bx;
   return z > 0;
 };

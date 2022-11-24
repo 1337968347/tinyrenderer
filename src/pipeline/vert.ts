@@ -1,9 +1,9 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { Matrix4, Vector4 } from 'three';
 
 // 图元
-type attributeProps = { [key: string]: vec3[] };
-type attributeProp = { [key: string]: vec3 };
-type uniformsProps = { [key: string]: vec3 | number | mat4 };
+type attributeProps = { [key: string]: Vector4[] };
+type attributeProp = { [key: string]: Vector4 };
+type uniformsProps = { [key: string]: Vector4 | number | Matrix4 };
 
 /**
  * 顶点变换管线
@@ -25,12 +25,12 @@ const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertS
     vNormal: [],
   };
   // 用来做后面裁剪，光栅化深度测试用的顶点位置数据
-  const gl_positions: vec3[] = [];
+  const gl_positions: Vector4[] = [];
   // 逐顶点处理
   for (let i = 0; i < vertLen; i++) {
     // 复制当前顶点
     for (let key in attributes) {
-      attribute[key] = vec3.clone(attributes[key][i]);
+      attribute[key] = new Vector4().copy(attributes[key][i]);
     }
     const { gl_position } = vertShader(attribute, uniforms, varyings);
     gl_positions.push(gl_position);
@@ -48,15 +48,15 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProps, varyings:
   const { position, normal } = attribute;
   const { modelMatrix, projectionMatrix } = uniforms;
   // 世界坐标
-  const vWorldPosition = vec3.create();
+  const vWorldPosition = new Vector4().copy(position);
   // 法线
-  const vNormal = vec3.create();
+  const vNormal = new Vector4().copy(normal);
   // 标准投影空间的坐标
-  const gl_position = vec3.create();
+  const gl_position = new Vector4();
 
-  vec3.transformMat4(vNormal, normal, modelMatrix as mat4);
-  vec3.transformMat4(vWorldPosition, position, modelMatrix as mat4);
-  vec3.transformMat4(gl_position, vWorldPosition, projectionMatrix as mat4);
+  vNormal.applyMatrix4(modelMatrix as Matrix4);
+  vWorldPosition.applyMatrix4(modelMatrix as Matrix4);
+  gl_position.copy(vWorldPosition).applyMatrix4(projectionMatrix as Matrix4);
   // 传递给片元着色器的参数
   varyings['vNormal'].push(vNormal);
   varyings['vWorldPosition'].push(vWorldPosition);

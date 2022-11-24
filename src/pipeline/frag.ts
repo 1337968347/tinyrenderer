@@ -1,14 +1,14 @@
-import { vec3, vec4 } from 'gl-matrix';
+import { Vector4 } from 'three';
 import { FragmentData } from './rasterization';
 
-const fragShader = (fragmentData: FragmentData): vec4 => {
-  const gl_FragColor = vec4.clone([0, 0, 0, 1]);
+const fragShader = (fragmentData: FragmentData): Vector4 => {
+  const gl_FragColor = new Vector4();
   const { primitiveData } = fragmentData;
-  let { vNormal, vWorldPosition } = primitiveData;
-  vec3.normalize(vNormal, vNormal);
-  const diffuse = vec3.dot(vNormal, [0, -1, 0]);
-  gl_FragColor[3] = diffuse 
-  vec4.scale(gl_FragColor, gl_FragColor, 255);
+  let { vNormal } = primitiveData;
+  vNormal.normalize()
+  const diffuse = vNormal.dot(new Vector4(0, -1, 0, 1));
+  gl_FragColor.w = diffuse;
+  gl_FragColor.multiplyScalar(255)
   return gl_FragColor;
 };
 
@@ -19,10 +19,10 @@ const fragPipeline = (fragmentData: FragmentData[], imageData: ImageData, width:
     const { x, y } = fragmentItem;
     const gl_FragColor = fragShader(fragmentItem);
     const offset = ((height - y) * width + x) * 4;
-    imageData.data[offset] = gl_FragColor[0];
-    imageData.data[offset + 1] = gl_FragColor[1];
-    imageData.data[offset + 2] = gl_FragColor[2];
-    imageData.data[offset + 3] = gl_FragColor[3];
+    imageData.data[offset] = gl_FragColor.x;
+    imageData.data[offset + 1] = gl_FragColor.y;
+    imageData.data[offset + 2] = gl_FragColor.z;
+    imageData.data[offset + 3] = gl_FragColor.w;
   }
   return imageData;
 };

@@ -1,34 +1,34 @@
-import { vec3 } from 'gl-matrix';
+import { Vector4, Vector3 } from "three"
 
 // 包围盒
 class BBox {
-  pMin = vec3.clone([Infinity, Infinity, Infinity]);
-  pMax = vec3.clone([-Infinity, -Infinity, -Infinity]);
-  constructor(points: vec3[]) {
+  pMin = new Vector3(Infinity, Infinity, Infinity);
+  pMax = new Vector3(-Infinity, -Infinity, -Infinity);
+  constructor(points: Vector3[]) {
     for (let i = 0; i < points.length; i++) {
-      this.pMin[0] = Math.min(this.pMin[0], points[i][0]);
-      this.pMin[1] = Math.min(this.pMin[1], points[i][1]);
-      this.pMin[2] = Math.min(this.pMin[2], points[i][2]);
-      this.pMax[0] = Math.max(this.pMax[0], points[i][0]);
-      this.pMax[1] = Math.max(this.pMax[1], points[i][1]);
-      this.pMax[2] = Math.max(this.pMax[2], points[i][2]);
+      this.pMin.x = Math.min(this.pMin.x, points[i].x);
+      this.pMin.y = Math.min(this.pMin.y, points[i].y);
+      this.pMin.z = Math.min(this.pMin.z, points[i].z);
+      this.pMax.x = Math.max(this.pMax.x, points[i].x);
+      this.pMax.y = Math.max(this.pMax.y, points[i].y);
+      this.pMax.z = Math.max(this.pMax.z, points[i].z);
     }
   }
 
   // 是否有重叠
   overlaps(bbox: BBox) {
     const { pMin, pMax } = this;
-    const x = pMax[0] >= bbox.pMin[0] && pMin[0] <= bbox.pMax[0];
-    const y = pMax[1] >= bbox.pMin[1] && pMin[1] <= bbox.pMax[1];
-    const z = pMax[2] >= bbox.pMin[2] && pMin[2] <= bbox.pMax[2];
+    const x = pMax.x >= bbox.pMin.x && pMin.x <= bbox.pMax.x;
+    const y = pMax.y >= bbox.pMin.y && pMin.y <= bbox.pMax.y;
+    const z = pMax.z >= bbox.pMin.z && pMin.z <= bbox.pMax.z;
     return x && y && z;
   }
 
-  inside(pt: vec3) {
+  inside(pt: Vector4) {
     const { pMin, pMax } = this;
-    return pt[0] >= pMin[0] && pt[0] <= pMax[0] &&
-     pt[1] >= pMin[1] && pt[1] <= pMax[1] && 
-     pt[2] >= pMin[2] && pt[2] <= pMax[2];
+    return pt.x >= pMin.x && pt.x <= pMax.x &&
+     pt.y >= pMin.y && pt.y <= pMax.y && 
+     pt.z >= pMin.z && pt.z <= pMax.z;
   }
 }
 
