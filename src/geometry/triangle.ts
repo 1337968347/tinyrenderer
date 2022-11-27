@@ -51,6 +51,7 @@ const getUV = (trangle: Trangle, p: Vector4) => {
   const AB = { x: B.x - A.x, y: B.y - A.y };
   const AC = { x: C.x - A.x, y: C.y - A.y };
   // 重心坐标 AP = u * AB + v* AC;
+  // 面积
   return {
     u: (AP.x * AB.y - AB.x * AP.y) / (AC.x * AB.y - AB.x * AC.y),
     v: (AP.x * AC.y - AC.x * AP.y) / (AB.x * AC.y - AC.x * AB.y),

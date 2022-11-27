@@ -4,23 +4,16 @@ import { Trangle, BBox } from '../geometry';
 // 视锥体剔除  背面剔除
 const croppingPipeline = (primitiveData: { [key: string]: Trangle[] }, gl_positions: Trangle[]) => {
   const bbox = new BBox([new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, 0.5, 0.5)]);
-  // 通过裁剪流水线的数据
-  const cropped_PrimitiveData: { [key: string]: Trangle[] } = {};
-  const cropped_Gl_Positions: Trangle[] = [];
-  for (let i in primitiveData) {
-    cropped_PrimitiveData[i] = [];
-  }
+
   for (let i = 0; i < gl_positions.length; i++) {
     // 通过 视锥体剔除 和 背面剔除
-    if (frustumCull(gl_positions[i], bbox) && backCull(gl_positions[i])) {
-      cropped_Gl_Positions.push(gl_positions[i]);
+    if (!frustumCull(gl_positions[i], bbox) || !backCull(gl_positions[i])) {
+      gl_positions.splice(i, 1);
       for (let key in primitiveData) {
-        cropped_PrimitiveData[key].push(primitiveData[key][i]);
+        primitiveData[key].splice(i, 1);
       }
     }
   }
-
-  return { cropped_PrimitiveData, cropped_Gl_Positions };
 };
 
 // 视锥体剔除

@@ -8,22 +8,34 @@ const clamp = (min: number, n: number, max: number) => {
 type FragmentData = {
   x: number;
   y: number;
-  pos: Vector4;
-  isHit: boolean;
-  primitiveData: { [key: string]: Vector4 };
+  u: number;
+  v: number;
+  trangleIdx: number;
+  z?: number;
+  primitiveData?: { [key: string]: Vector4 };
 };
+
+type rasterizationPipelineProps = {
+  varyingData: { [key: string]: Trangle[] };
+  glPosition: Trangle[];
+  width: number;
+  height: number;
+  zBuffer: Float32Array;
+};
+
 /**
  * 光栅化三角形
  * 离散化
- * @param trangle
+ * @param glPosition nds 标准成像空间 三角形
+ * @param i 三角形下标
  * @param width 离散的点
  * @param height
  * @returns trangleFragments 三角形光栅化后对应的片元数据
  */
-const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => {
+const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, height: number) => {
   // 这个三角形的片元数据
-  const trangleFragments = [];
-  const [a, b, c] = trangle.points;
+  const trangleFragments: FragmentData[] = [];
+  const [a, b, c] = glPosition[i].points;
   // 加 0.5把 [-0.5, -0.5] 映射到 [0, 1]
   const A = new Vector4((a.x + 0.5) * width, (a.y + 0.5) * height, 0, 1.0);
   const B = new Vector4((b.x + 0.5) * width, (b.y + 0.5) * height, 0, 1.0);
@@ -41,11 +53,15 @@ const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => 
       const { u, v, inside } = inside_Triangle(pixTrangle, new Vector4(x, y, 0, 1));
       if (inside) {
         trangleFragments.push({
+          // 当前像素坐标值
           x,
           y,
+          // 当前片元在当前三角形中的uv值
           u,
           v,
-          pos: lerp_Triangle_UV(trangle, u, v),
+          trangleIdx: 0,
+          // 深度缓存
+          z: (1 - u - v) * c.z + u * a.z + v * b.z,
         });
       }
     }
@@ -54,43 +70,55 @@ const rasterize_Triangle = (trangle: Trangle, width: number, height: number) => 
   return trangleFragments;
 };
 
-// 光栅化 生成片元数据
-const rasterizationPipeline = (primitiveData: { [key: string]: Trangle[] }, Gl_Positions: Trangle[], width: number, height: number): FragmentData[] => {
+/**
+ * 光栅化 生成片元数据
+ * @param props
+ * @returns
+ */
+const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[] => {
+  const { varyingData, glPosition, width, height, zBuffer } = props;
+  zBuffer.fill(-Infinity);
   // 帧缓存数据
   const FRAGMENTDATAS: FragmentData[] = new Array(width * height);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      FRAGMENTDATAS[y * width + x] = {
-        primitiveData: {},
-        pos: new Vector4(x, y, -Infinity, 1.0),
-        isHit: false,
+      FRAGMENTDATAS[y * height + x] = {
         x,
         y,
+        u: 0,
+        v: 0,
+        trangleIdx: -1,
       };
     }
   }
 
   // 每个图元
-  for (let i = 0; i < Gl_Positions.length; i++) {
-    const ndsTriangle = Gl_Positions[i];
-    const primitiveVec3 = {};
-    for (let key in primitiveData) {
-      primitiveVec3[key] = primitiveData[key][i];
-    }
+  for (let i = 0; i < glPosition.length; i++) {
     // 这个三角形光栅化后的片元数据
-    const triangleFragments = rasterize_Triangle(ndsTriangle, width, height);
+    const triangleFragments = rasterize_Triangle(glPosition, i, width, height);
     // 每个片元
     for (let n = 0; n < triangleFragments.length; n++) {
       const temp = triangleFragments[n];
-      const fragment = FRAGMENTDATAS[temp.y * width + temp.x];
-      if (temp.pos.z > fragment.pos.z) {
-        // const { u, v } = fragment;
-        fragment.pos = temp.pos;
-        fragment.primitiveData = {};
-        fragment.isHit = true;
-        for (let key in primitiveVec3) {
-          fragment.primitiveData[key] = lerp_Triangle_UV(primitiveVec3[key], temp.u, temp.v);
-        }
+      const offset = temp.y * width + temp.x;
+      const fragment = FRAGMENTDATAS[offset];
+      // z深度测试 并且保存下标以及uv值
+      if (temp.z > zBuffer[offset]) {
+        zBuffer[offset] = temp.z;
+        fragment.u = temp.u;
+        fragment.v = temp.v;
+        fragment.trangleIdx = i;
+      }
+    }
+  }
+
+  // 插值片元数据
+  for (let i = 0; i < FRAGMENTDATAS.length; i++) {
+    const fragmentItem = FRAGMENTDATAS[i];
+    if (fragmentItem.trangleIdx !== -1) {
+      fragmentItem.primitiveData = {};
+      const { u, v, trangleIdx } = fragmentItem;
+      for (const key in varyingData) {
+        fragmentItem.primitiveData[key] = lerp_Triangle_UV(varyingData[key][trangleIdx], u, v);
       }
     }
   }
