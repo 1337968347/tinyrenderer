@@ -1,6 +1,6 @@
 import { Matrix4 } from 'three';
-import { createCanvasRenderingContext2D, getPosAndNormal } from './utils';
-import { vertPipeline, vertShader, trangleMakePipeline, croppingPipeline, rasterizationPipeline, fragPipeline } from './pipeline';
+import { createCanvasRenderingContext2D, getPosAndNormal } from './engine/utils';
+import { vertPipeline, vertShader, trangleMakePipeline, croppingPipeline, rasterizationPipeline, fragPipeline } from './engine/pipeline';
 import { bunnyStr } from './assets/bunny-obj';
 
 const WIDTH = 512;
