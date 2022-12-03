@@ -5,9 +5,9 @@ declare global {
   // 图元
   type attributeProps = { [key: string]: Vector4[] };
   type uniformsProp = { [key: string]: Vector4 | number | Matrix4 };
-
-  type VaryingData = { [key: string]: Trangle[] };
-
+  // 图元数据
+  type PrimitiveData = { [key: string]: Trangle[] };
+  // 片元数据
   type FragmentData = {
     x: number;
     y: number;

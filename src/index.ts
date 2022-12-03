@@ -1,5 +1,5 @@
 import { Matrix4 } from 'three';
-import { Render2FrameBufferData } from './engine';
+import { Render2FrameBuffer } from './engine';
 import { getPosAndNormal } from './engine/utils';
 import { bunnyStr } from './assets/bunny-obj';
 import { vertShader, fragShader } from './shader';
@@ -19,5 +19,5 @@ canvasEl.width = width;
 canvasEl.height = height;
 const ctx = canvasEl.getContext('2d');
 const frameBufferData = ctx.getImageData(0, 0, width, height);
-Render2FrameBufferData({ attributes, uniforms, frameBufferData, vertShader, fragShader });
+Render2FrameBuffer({ attributes, uniforms, frameBufferData, vertShader, fragShader });
 ctx.putImageData(frameBufferData, 0, 0);

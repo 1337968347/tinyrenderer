@@ -2,8 +2,8 @@ import { Vector4 } from 'three';
 import { Trangle } from '../geometry';
 
 // 图元组装
-const trangleMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
-  const primitiveVaryingData: VaryingData = {};
+const primitiveMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
+  const primitiveVaryingData: PrimitiveData = {};
   const primitiveGlPosition: Trangle[] = [];
   for (let key in attribute) {
     primitiveVaryingData[key] = [];
@@ -18,4 +18,4 @@ const trangleMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positio
   return { primitiveVaryingData, primitiveGlPosition };
 };
 
-export { trangleMakePipeline };
+export { primitiveMakePipeline };

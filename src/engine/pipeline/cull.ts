@@ -2,7 +2,7 @@ import { Vector3 } from 'three';
 import { Trangle, BBox } from '../geometry';
 
 // 视锥体剔除  背面剔除
-const croppingPipeline = (primitiveData: VaryingData, gl_positions: Trangle[]) => {
+const croppingPipeline = (primitiveData: PrimitiveData, gl_positions: Trangle[]) => {
   const bbox = new BBox([new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, 0.5, 0.5)]);
 
   for (let i = 0; i < gl_positions.length; i++) {

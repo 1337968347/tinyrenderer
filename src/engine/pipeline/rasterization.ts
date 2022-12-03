@@ -6,7 +6,7 @@ const clamp = (min: number, n: number, max: number) => {
 };
 
 type rasterizationPipelineProps = {
-  varyingData: VaryingData;
+  primitiveData: PrimitiveData;
   glPosition: Trangle[];
   width: number;
   height: number;
@@ -66,7 +66,7 @@ const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, hei
  * @returns
  */
 const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[] => {
-  const { varyingData, glPosition, width, height, zBuffer } = props;
+  const { primitiveData, glPosition, width, height, zBuffer } = props;
   zBuffer.fill(-Infinity);
   // 帧缓存数据
   const FRAGMENTDATAS: FragmentData[] = new Array(width * height);
@@ -107,8 +107,8 @@ const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[
     if (fragmentItem.trangleIdx !== -1) {
       fragmentItem.primitiveData = {};
       const { u, v, trangleIdx } = fragmentItem;
-      for (const key in varyingData) {
-        fragmentItem.primitiveData[key] = lerp_Triangle_UV(varyingData[key][trangleIdx], u, v);
+      for (const key in primitiveData) {
+        fragmentItem.primitiveData[key] = lerp_Triangle_UV(primitiveData[key][trangleIdx], u, v);
       }
     }
   }

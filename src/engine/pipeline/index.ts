@@ -1,7 +1,7 @@
 // 顶点处理， 顶点变换
 export { vertPipeline } from './vert';
 // 图元组装
-export { trangleMakePipeline } from './primitive';
+export { primitiveMakePipeline } from './primitive';
 // 裁剪处理
 export { croppingPipeline } from './cull';
 // 光栅化
