@@ -8,3 +8,10 @@ export { croppingPipeline } from './cull';
 export { rasterizationPipeline } from './rasterization';
 // 片元着色器
 export { fragPipeline } from './frag';
+
+class ShaderProgram {
+  constructor() {}
+
+  draw() {}
+}
+export { ShaderProgram };

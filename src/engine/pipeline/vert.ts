@@ -1,21 +1,13 @@
 import { Vector4 } from 'three';
 
-/**
- * 顶点变换管线
- * @param attribute attributeProps
- * @param uniforms uniformsProp
- * @param varying
- * @param vertShaderHandle
- * @returns {varyings, gl_positions}
- */
-const vertPipeline = (attributes: attributeProps, uniforms: uniformsProp, vertShader) => {
+const vertPipeline: VertPipeline = ({ attributes, uniforms, vertShader }) => {
   const { position } = attributes;
   if (position.length < 3) throw new Error('顶点数太少');
 
   const vertLen = position.length;
   const attribute = {};
   // 逐顶点计算的数据
-  const varyings = {
+  const varyings: attributeProps = {
     vWorldPosition: [],
     vNormal: [],
   };

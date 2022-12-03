@@ -17,4 +17,18 @@ declare global {
     z?: number;
     primitiveData?: { [key: string]: Vector4 };
   };
+
+  type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps) => { gl_position: Vector4 };
+
+  type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => {
+    varyings: attributeProps;
+    gl_positions: Vector4[];
+  };
+  type FragPipeline = (props: { fragmentData: FragmentData[]; data: Uint8ClampedArray; fragShader; width: number; height: number }) => void;
+  type ProgramProp = {
+    attributes: attributeProps;
+    vertShader: VertShader;
+    fragShader;
+    frameBufferData;
+  };
 }
