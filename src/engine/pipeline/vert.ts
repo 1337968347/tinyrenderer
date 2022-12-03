@@ -1,19 +1,14 @@
-import { Matrix4, Vector4 } from 'three';
-
-// 图元
-type attributeProps = { [key: string]: Vector4[] };
-
-type uniformsProps = { [key: string]: Vector4 | number | Matrix4 };
+import { Vector4 } from 'three';
 
 /**
  * 顶点变换管线
  * @param attribute attributeProps
- * @param uniforms uniformsProps
+ * @param uniforms uniformsProp
  * @param varying
  * @param vertShaderHandle
  * @returns {varyings, gl_positions}
  */
-const vertPipeline = (attributes: attributeProps, uniforms: uniformsProps, vertShader) => {
+const vertPipeline = (attributes: attributeProps, uniforms: uniformsProp, vertShader) => {
   const { position } = attributes;
   if (position.length < 3) throw new Error('顶点数太少');
 

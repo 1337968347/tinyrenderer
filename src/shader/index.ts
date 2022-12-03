@@ -1,15 +1,12 @@
 import { Matrix4, Vector4 } from 'three';
 import { FragmentData } from '../engine/pipeline/rasterization';
 
-type attributeProp = { [key: string]: Vector4 };
-type uniformsProps = { [key: string]: Vector4 | number | Matrix4 };
-
 /**
  * 顶点变换 着色器
  * @param attribute
  * @param uniforms
  */
-const vertShader = (attribute: attributeProp, uniforms: uniformsProps, varyings: Object) => {
+const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: Object) => {
   const { position, normal } = attribute;
   const { modelMatrix, projectionMatrix } = uniforms;
   // 世界坐标

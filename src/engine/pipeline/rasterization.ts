@@ -5,18 +5,8 @@ const clamp = (min: number, n: number, max: number) => {
   return Math.max(min, Math.min(n, max));
 };
 
-type FragmentData = {
-  x: number;
-  y: number;
-  u: number;
-  v: number;
-  trangleIdx: number;
-  z?: number;
-  primitiveData?: { [key: string]: Vector4 };
-};
-
 type rasterizationPipelineProps = {
-  varyingData: { [key: string]: Trangle[] };
+  varyingData: VaryingData;
   glPosition: Trangle[];
   width: number;
   height: number;
