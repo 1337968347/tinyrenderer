@@ -13,8 +13,8 @@ modelMatrix.multiply(new Matrix4().makeScale(4, 4, 4));
 // 投影矩阵
 const projectionMatrix = new Matrix4().identity();
 const uniforms = { modelMatrix, projectionMatrix };
-const width = 256;
-const height = 256;
+const width = 612;
+const height = 512;
 canvasEl.width = width;
 canvasEl.height = height;
 const ctx = canvasEl.getContext('2d');
@@ -23,4 +23,5 @@ const { draw } = Render2FrameBuffer({ attributes, frameBufferData, vertShader, f
 console.time('render');
 draw(uniforms);
 console.timeEnd('render');
+
 ctx.putImageData(frameBufferData, 0, 0);

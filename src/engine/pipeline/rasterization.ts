@@ -67,19 +67,16 @@ const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, hei
  */
 const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[] => {
   const { primitiveData, glPosition, width, height, zBuffer } = props;
+
   zBuffer.fill(-Infinity);
   // 帧缓存数据
-  const FRAGMENTDATAS: FragmentData[] = new Array(width * height);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      FRAGMENTDATAS[y * height + x] = {
-        x,
-        y,
-        u: 0,
-        v: 0,
-        trangleIdx: -1,
-      };
-    }
+  const FRAGMENTDATAS: FragmentData[] = new Array(zBuffer.length);
+  for (let i = 0; i < zBuffer.length; i++) {
+    FRAGMENTDATAS[i] = {
+      u: 0,
+      v: 0,
+      trangleIdx: -1,
+    };
   }
 
   // 每个图元
@@ -102,9 +99,9 @@ const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[
   }
 
   // 插值片元数据
-  for (let i = 0; i < FRAGMENTDATAS.length; i++) {
-    const fragmentItem = FRAGMENTDATAS[i];
-    if (fragmentItem.trangleIdx !== -1) {
+  for (let i = 0; i < zBuffer.length; i++) {
+    if (zBuffer[i] !== -Infinity) {
+      const fragmentItem = FRAGMENTDATAS[i];
       fragmentItem.primitiveData = {};
       const { u, v, trangleIdx } = fragmentItem;
       for (const key in primitiveData) {
@@ -112,7 +109,6 @@ const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[
       }
     }
   }
-
   return FRAGMENTDATAS;
 };
 

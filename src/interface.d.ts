@@ -9,8 +9,8 @@ declare global {
   type PrimitiveData = { [key: string]: Trangle[] };
   // 片元数据
   type FragmentData = {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
     u: number;
     v: number;
     trangleIdx: number;
@@ -24,7 +24,7 @@ declare global {
     varyings: attributeProps;
     gl_positions: Vector4[];
   };
-  type FragPipeline = (props: { fragmentData: FragmentData[]; data: Uint8ClampedArray; fragShader; width: number; height: number }) => void;
+  type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader }) => void;
   type ProgramProp = {
     attributes: attributeProps;
     vertShader: VertShader;
