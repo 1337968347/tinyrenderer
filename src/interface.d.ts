@@ -20,15 +20,17 @@ declare global {
 
   type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps) => { gl_position: Vector4 };
 
+  type FragShader = (fragmentData: FragmentData, gl_FragColor: Vector4) => void;
+
   type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => {
     varyings: attributeProps;
     gl_positions: Vector4[];
   };
-  type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader }) => void;
+  type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader: FragShader }) => void;
   type ProgramProp = {
     attributes: attributeProps;
     vertShader: VertShader;
-    fragShader;
-    frameBufferData;
+    fragShader: FragShader;
+    frameBufferData: ImageData;
   };
 }
