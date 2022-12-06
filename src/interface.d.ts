@@ -34,4 +34,6 @@ declare global {
     fragShader: FragShader;
     frameBufferData: ImageData;
   };
+
+  type TickFunc = (time: number) => void;
 }
