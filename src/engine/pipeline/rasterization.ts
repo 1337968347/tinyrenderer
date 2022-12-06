@@ -1,9 +1,6 @@
 import { Vector4 } from 'three';
 import { inside_Triangle, Trangle, lerp_Triangle_UV } from '../geometry';
-
-const clamp = (min: number, n: number, max: number) => {
-  return Math.max(min, Math.min(n, max));
-};
+import { clamp } from '../utils';
 
 type rasterizationPipelineProps = {
   primitiveData: PrimitiveData;
@@ -99,7 +96,7 @@ const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[
   }
 
   // 插值片元数据
-  for (let i = 0; i < zBuffer.length; i++) {
+  for (let i = 0; i < FRAGMENTDATAS.length; i++) {
     if (zBuffer[i] !== -Infinity) {
       const fragmentItem = FRAGMENTDATAS[i];
       fragmentItem.primitiveData = {};
