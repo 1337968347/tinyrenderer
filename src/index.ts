@@ -36,3 +36,4 @@ prepareScene();
 clock = new Clock();
 clock.setOnTick(tick);
 clock.start();
+clock.stop()

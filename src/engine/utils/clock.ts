@@ -6,7 +6,7 @@ class Clock {
 
   constructor() {}
 
-  start = () => {
+  start() {
     this.isRunning = true;
     this.nowT = new Date().getTime();
     const intervalRequest = func => {
@@ -20,25 +20,26 @@ class Clock {
       }
     };
     loopFunc(f);
-  };
+    this.tick();
+  }
 
-  stop = () => {
+  stop() {
     this.isRunning = false;
     if (this.timeId) {
       clearInterval(this.timeId);
       this.timeId = null;
     }
-  };
+  }
 
-  tick = () => {
+  tick() {
     const t = this.nowT;
     this.nowT = new Date().getTime();
     this.onTick && this.onTick((this.nowT - t) / 1000);
-  };
+  }
 
-  setOnTick = (onTick: TickFunc) => {
+  setOnTick(onTick: TickFunc) {
     this.onTick = onTick;
-  };
+  }
 }
 
 export { Clock };
