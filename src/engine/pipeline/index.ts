@@ -4,6 +4,8 @@ import { vertPipeline } from './vert';
 import { primitiveMakePipeline } from './primitive';
 // 裁剪处理
 import { croppingPipeline } from './cull';
+// 透视除法
+import { divisionPipeline } from './division';
 // 光栅化
 import { rasterizationPipeline } from './rasterization';
 // 片元着色器
@@ -36,6 +38,8 @@ class ShaderProgram {
     data.fill(0);
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
+    // 透视除法
+    // divisionPipeline(gl_positions);
     // 图元组装
     const { primitiveVaryingData, primitiveGlPosition } = primitiveMakePipeline(varyings, gl_positions);
     // 裁剪处理 (背面剔除, 视锥体剔除)

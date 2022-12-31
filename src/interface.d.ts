@@ -4,7 +4,7 @@ import { Texture2D } from './engine/geometry/texture';
 declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
-  type attributeProps = { [key: string]: Vector4[] };
+  type attributeProps = { position?: Vector4[]; [key: string]: Vector4[] };
   type uniformsProp = { [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
@@ -27,6 +27,9 @@ declare global {
     varyings: attributeProps;
     gl_positions: Vector4[];
   };
+
+  type DivisionPipeline = (position: Vector4[]) => void;
+
   type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader: FragShader }) => void;
   type ProgramProp = {
     attributes: attributeProps;

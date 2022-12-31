@@ -1,7 +1,7 @@
 import { Vector4 } from 'three';
 
 const fragPipeline: FragPipeline = ({ fragmentData, zBuffer, data, fragShader }) => {
-  const gl_FragColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+  const gl_FragColor = new Vector4(256.0, 256.0, 256.0, 256.0);
   for (let i = 0; i < zBuffer.length; i++) {
     if (zBuffer[i] === -Infinity) continue;
     const fragmentItem = fragmentData[i];

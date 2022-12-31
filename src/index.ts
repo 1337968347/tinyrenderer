@@ -23,8 +23,8 @@ const prepareScene = () => {
   camera = new Scene.Camera();
   inputHandler = new InputHandler(canvasEl);
   cameraController = new CameraController(inputHandler, camera);
-  const width = 256;
-  const height = 256;
+  const width = 512;
+  const height = 512;
   canvasEl.width = width;
   canvasEl.height = height;
   ctx = canvasEl.getContext('2d');
