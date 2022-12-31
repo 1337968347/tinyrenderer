@@ -1,4 +1,4 @@
-import { Matrix4, Vector3 } from 'three';
+import { Matrix3, Matrix4, Vector3, Vector4 } from 'three';
 import { ShaderProgram } from '../pipeline';
 
 class SceneNode {
@@ -15,20 +15,25 @@ class SceneNode {
     this.exit(graph);
   }
 
+  append(node: SceneNode) {
+    this.children.push(node);
+  }
+
   enter(_graph: Graph) {}
   exit(_graph: Graph) {}
 }
 
-class Graph {
+export class Graph {
   children: SceneNode[];
   uniform: uniformsProp = {};
   programs: ShaderProgram[] = [];
-  root: SceneNode;
-  constructor(children: SceneNode[]) {
-    this.root = new SceneNode(children);
+  root: SceneNode = new SceneNode([]);
+
+  append(node: SceneNode) {
+    this.root.append(node);
   }
 
-  draw() {
+  tick() {
     this.root.visit(this);
   }
 
@@ -53,27 +58,29 @@ class Graph {
   }
 }
 
-class Material extends SceneNode {
+export class Material extends SceneNode {
   program: ShaderProgram;
   uniforms: Uniforms;
-  constructor(program: ShaderProgram, uniforms: Uniforms, children: SceneNode[]) {
+  constructor(program: ShaderProgram, uniforms: Uniforms, children: SceneNode[] = []) {
     super(children);
     this.program = program;
     this.uniforms = uniforms;
   }
 
   enter(graph: Graph): void {
+    graph.pushProgram(this.program);
     this.uniforms.enter(graph);
   }
 
   exit(graph: Graph) {
+    graph.popProgram();
     this.uniforms.exit(graph);
   }
 }
 
-class Uniforms extends SceneNode {
+export class Uniforms extends SceneNode {
   uniforms: uniformsProp;
-  constructor(uniforms: uniformsProp, children: SceneNode[]) {
+  constructor(uniforms: uniformsProp, children: SceneNode[] = []) {
     super(children);
     this.uniforms = uniforms;
   }
@@ -90,9 +97,9 @@ class Uniforms extends SceneNode {
   }
 }
 
-class Mesh extends SceneNode {
+export class Mesh extends SceneNode {
   children: SceneNode[];
-  constructor(children: SceneNode[]) {
+  constructor(children: SceneNode[] = []) {
     super(children);
   }
 
@@ -102,7 +109,7 @@ class Mesh extends SceneNode {
   }
 }
 
-class Camera extends SceneNode {
+export class Camera extends SceneNode {
   // x Rotate
   x: number = 0.0;
   // y Rotate
@@ -116,23 +123,42 @@ class Camera extends SceneNode {
   // 相机视野左右跟上下的比例
   aspect: number = 1;
   position: Vector3;
-  constructor(children: SceneNode[]) {
-    super(children);
+  constructor(children: SceneNode[] = []) {
+    super(children || []);
     this.position = new Vector3(0.0, 0.0, 0.0);
   }
 
   enter(graph: Graph) {
     graph.pushUniforms();
+
+    const projectMat4 = this.perspective();
+    const worldViewMat4 = this.getWorldView();
+    const mvp = new Matrix4().multiplyMatrices(projectMat4, worldViewMat4);
+    graph.uniform.projection = mvp;
+    graph.uniform.modelView = worldViewMat4;
+    graph.uniform.eye = this.position;
   }
 
   exit(graph: Graph) {
     graph.popUniforms();
   }
 
+  project(point: Vector4) {
+    const mvp = new Matrix4().multiplyMatrices(this.perspective(), this.getWorldView());
+    const p = point.applyMatrix4(mvp);
+    // 透视除法
+    p.multiplyScalar(1 / p.z);
+    return p;
+  }
+
   perspective() {
     var top = this.near * Math.tan((this.fov * Math.PI) / 360.0);
     var right = top * this.aspect;
     return new Matrix4().makePerspective(-right, right, -top, top, this.near, this.far);
+  }
+
+  getInverseRotation() {
+    return new Matrix4().setFromMatrix3(new Matrix3().setFromMatrix4(this.getWorldView().invert()));
   }
 
   getWorldView() {
@@ -143,5 +169,3 @@ class Camera extends SceneNode {
     return new Matrix4().multiplyMatrices(rotateMat4, translateMat4);
   }
 }
-
-export { Graph, Mesh, Material, Uniforms, Camera };

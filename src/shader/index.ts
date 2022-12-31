@@ -8,17 +8,17 @@ import { FragmentData } from '../engine/pipeline/rasterization';
  */
 const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: Object) => {
   const { position, normal } = attribute;
-  const { modelMatrix, projectionMatrix } = uniforms;
+  const { modelView, projection } = uniforms;
   // 世界坐标
   const vWorldPosition = new Vector4().copy(position);
   // 法线
   const vNormal = new Vector4().copy(normal);
   // 标准投影空间的坐标
-  const gl_position = new Vector4();
+  const gl_position = new Vector4().copy(position);
 
-  vNormal.applyMatrix4(modelMatrix as Matrix4);
-  vWorldPosition.applyMatrix4(modelMatrix as Matrix4);
-  gl_position.copy(vWorldPosition).applyMatrix4(projectionMatrix as Matrix4);
+  vNormal.applyMatrix4(modelView as Matrix4);
+  vWorldPosition.applyMatrix4(modelView as Matrix4);
+  gl_position.applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数
   varyings['vNormal'].push(vNormal);
   varyings['vWorldPosition'].push(vWorldPosition);

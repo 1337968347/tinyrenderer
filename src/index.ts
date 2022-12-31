@@ -1,39 +1,48 @@
-import { Matrix4 } from 'three';
+import * as Scene from './engine/scene';
 import { ShaderProgram } from './engine/pipeline';
 import { getPosAndNormal } from './engine/utils';
 import { bunnyStr } from './assets/bunny-obj';
 import { vertShader, fragShader } from './shader';
 import { Clock } from './engine/utils';
+import CameraController from './engine/control/cameraController';
+import InputHandler from './engine/control/input';
 
 let globalUniform: uniformsProp = {};
-let pragram = null;
+
 let ctx = null;
 let frameBufferData = null;
 let clock = null;
+let cameraController: CameraController;
+let camera: Scene.Camera;
+let graph = new Scene.Graph();
+let inputHandler: InputHandler;
+
 const prepareScene = () => {
   const canvasEl = document.querySelector('canvas');
   const attributes = getPosAndNormal(bunnyStr);
-  // 模型变换矩阵
-  const modelMatrix = new Matrix4().makeTranslation(0, -0.3, 0.0);
-  modelMatrix.multiply(new Matrix4().makeScale(4, 4, 4));
-  // 投影矩阵
-  const projectionMatrix = new Matrix4().identity();
-  globalUniform = { modelMatrix, projectionMatrix };
-  const width = 512;
-  const height = 512;
+  camera = new Scene.Camera();
+  inputHandler = new InputHandler(canvasEl);
+  cameraController = new CameraController(inputHandler, camera);
+  const width = 256;
+  const height = 256;
   canvasEl.width = width;
   canvasEl.height = height;
   ctx = canvasEl.getContext('2d');
   frameBufferData = new ImageData(width, height);
-  pragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
+  const rabbitPragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
+  const rabertMesh = new Scene.Mesh();
+  const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertMesh]);
+  camera.append(baseMaterial);
+  graph.append(camera);
 };
-const tick = time => {
+const tick = (time: number) => {
   console.log(time);
-  pragram.draw(globalUniform);
+  cameraController.tick();
+  graph.tick();
   ctx.putImageData(frameBufferData, 0, 0);
 };
 prepareScene();
 clock = new Clock();
 clock.setOnTick(tick);
 clock.start();
-clock.stop()
+// clock.stop();

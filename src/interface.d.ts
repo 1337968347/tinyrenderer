@@ -1,11 +1,11 @@
-import { Matrix4, Vector4 } from 'three';
+import { Matrix4, Vector3, Vector4 } from 'three';
 import { Trangle } from '../src/engine/geometry';
 import { Texture2D } from './engine/geometry/texture';
 declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
   type attributeProps = { [key: string]: Vector4[] };
-  type uniformsProp = { [key: string]: Vector4 | number | Matrix4 | Texture2D };
+  type uniformsProp = { [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
   // 片元数据
