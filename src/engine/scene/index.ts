@@ -23,11 +23,37 @@ class SceneNode {
   exit(_graph: Graph) {}
 }
 
+type GraphProp = {
+  canvasEl?: HTMLCanvasElement;
+  width?: number;
+  height?: number;
+};
+// 开放场景图
 export class Graph {
   children: SceneNode[];
   uniform: uniformsProp = {};
   programs: ShaderProgram[] = [];
   root: SceneNode = new SceneNode([]);
+  canvasEl: HTMLCanvasElement = null;
+  ctx: CanvasRenderingContext2D;
+  viewPort: { width: number; height: number } = { width: 0, height: 0 };
+
+  constructor(props: GraphProp = { width: 512, height: 512 }) {
+    const { canvasEl, width, height } = props;
+    if (canvasEl) {
+      this.canvasEl = canvasEl;
+      this.ctx = this.canvasEl.getContext('2d');
+      this.viewPort.width = canvasEl.width || 512;
+      this.viewPort.height = canvasEl.height || 512;
+    } else {
+      this.canvasEl = document.createElement('canvas');
+      this.canvasEl.width = width;
+      this.canvasEl.height = height;
+      this.ctx = this.canvasEl.getContext('2d');
+      this.viewPort.width = width || 512;
+      this.viewPort.height = height || 512;
+    }
+  }
 
   append(node: SceneNode) {
     this.root.append(node);
@@ -103,9 +129,19 @@ export class Mesh extends SceneNode {
     super(children);
   }
 
-  visit(graph: Graph): void {
+  enter(graph: Graph): void {
+    const frameBufferData = graph.ctx.getImageData(0, 0, graph.viewPort.width, graph.viewPort.height);
+    const shaderProgram = graph.getProgram();
+    shaderProgram.bindFrameBuffer(frameBufferData);
+
     const program = graph.getProgram();
     program.draw(graph.uniform);
+  }
+
+  exit(graph: Graph): void {
+    const shaderProgram = graph.getProgram();
+    const frameBufferData = shaderProgram.frameBufferData;
+    graph.ctx.putImageData(frameBufferData, 0, 0);
   }
 }
 

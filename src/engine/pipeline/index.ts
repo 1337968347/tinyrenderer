@@ -17,11 +17,8 @@ class ShaderProgram {
   attributes: attributeProps;
   vertShader: VertShader;
   fragShader: FragShader;
-  constructor({ attributes, vertShader, fragShader, frameBufferData }: ProgramProp) {
-    const { width, height } = frameBufferData;
-    this.frameBufferData = frameBufferData;
+  constructor({ attributes, vertShader, fragShader }: ProgramProp) {
     this.attributes = attributes;
-    this.zBuffer = new Float32Array(width * height);
     this.vertShader = vertShader;
     this.fragShader = fragShader;
   }
@@ -35,7 +32,6 @@ class ShaderProgram {
   draw(uniforms: uniformsProp) {
     const { data, width, height } = this.frameBufferData;
     const { attributes, vertShader, zBuffer, fragShader } = this;
-    data.fill(0);
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
     // 透视除法

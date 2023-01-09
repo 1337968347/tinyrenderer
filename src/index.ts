@@ -9,37 +9,30 @@ import InputHandler from './engine/control/input';
 
 let globalUniform: uniformsProp = {};
 
-let ctx = null;
 let frameBufferData = null;
 let clock = null;
 let cameraController: CameraController;
 let camera: Scene.Camera;
-let graph = new Scene.Graph();
+const canvasEl = document.querySelector('canvas');
+canvasEl.width = 512;
+canvasEl.height = 512;
+let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler;
 
 const prepareScene = () => {
-  const canvasEl = document.querySelector('canvas');
   const attributes = getPosAndNormal(bunnyStr);
   camera = new Scene.Camera();
   inputHandler = new InputHandler(canvasEl);
   cameraController = new CameraController(inputHandler, camera);
-  const width = 512;
-  const height = 512;
-  canvasEl.width = width;
-  canvasEl.height = height;
-  ctx = canvasEl.getContext('2d');
-  frameBufferData = new ImageData(width, height);
   const rabbitPragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
   const rabertMesh = new Scene.Mesh();
   const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertMesh]);
   camera.append(baseMaterial);
   graph.append(camera);
 };
-const tick = (time: number) => {
-  console.log(time);
+const tick = (_time: number) => {
   cameraController.tick();
   graph.tick();
-  ctx.putImageData(frameBufferData, 0, 0);
 };
 prepareScene();
 clock = new Clock();
