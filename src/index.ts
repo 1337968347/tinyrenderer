@@ -14,8 +14,8 @@ let clock = null;
 let cameraController: CameraController;
 let camera: Scene.Camera;
 const canvasEl = document.querySelector('canvas');
-canvasEl.width = 512;
-canvasEl.height = 512;
+canvasEl.width = 256;
+canvasEl.height = 256;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler;
 

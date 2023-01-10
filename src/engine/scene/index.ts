@@ -131,6 +131,7 @@ export class Mesh extends SceneNode {
 
   enter(graph: Graph): void {
     const frameBufferData = graph.ctx.getImageData(0, 0, graph.viewPort.width, graph.viewPort.height);
+
     const shaderProgram = graph.getProgram();
     shaderProgram.bindFrameBuffer(frameBufferData);
 

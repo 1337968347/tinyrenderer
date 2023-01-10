@@ -37,7 +37,7 @@ class ShaderProgram {
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
     // 透视除法
-    // divisionPipeline(gl_positions);
+    divisionPipeline(gl_positions);
     // 图元组装
     const { primitiveVaryingData, primitiveGlPosition } = primitiveMakePipeline(varyings, gl_positions);
     // 裁剪处理 (背面剔除, 视锥体剔除)
