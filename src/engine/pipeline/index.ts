@@ -32,6 +32,8 @@ class ShaderProgram {
   draw(uniforms: uniformsProp) {
     const { data, width, height } = this.frameBufferData;
     const { attributes, vertShader, zBuffer, fragShader } = this;
+    zBuffer.fill(-Infinity);
+    data.fill(255);
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
     // 透视除法

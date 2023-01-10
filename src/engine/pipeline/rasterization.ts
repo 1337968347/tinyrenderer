@@ -65,7 +65,6 @@ const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, hei
 const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[] => {
   const { primitiveData, glPosition, width, height, zBuffer } = props;
 
-  zBuffer.fill(-Infinity);
   // 帧缓存数据
   const FRAGMENTDATAS: FragmentData[] = new Array(zBuffer.length);
   for (let i = 0; i < zBuffer.length; i++) {
