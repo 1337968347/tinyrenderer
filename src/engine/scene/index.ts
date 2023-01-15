@@ -172,7 +172,6 @@ export class Camera extends SceneNode {
     const worldViewMat4 = this.getWorldView();
     const mvp = new Matrix4().multiplyMatrices(projectMat4, worldViewMat4);
     graph.uniform.projection = mvp;
-    graph.uniform.modelView = worldViewMat4;
     graph.uniform.eye = this.position;
   }
 
@@ -204,5 +203,25 @@ export class Camera extends SceneNode {
     const rotateMat4 = new Matrix4().multiplyMatrices(rotateXMat4, rotateYMat4);
     const translateMat4 = new Matrix4().makeTranslation(-this.position.x, -this.position.y, -this.position.z);
     return new Matrix4().multiplyMatrices(rotateMat4, translateMat4);
+  }
+}
+
+export class Transform extends SceneNode {
+  wordMatrix = new Matrix4().identity();
+  constructor(children: SceneNode[]) {
+    super(children);
+  }
+
+  enter(graph: Graph): void {
+    graph.pushUniforms();
+    if (graph.uniform.modelView) {
+      graph.uniform.modelView = graph.uniform.modelView.multiply(this.wordMatrix);
+    } else {
+      graph.uniform.modelView = new Matrix4().copy(this.wordMatrix);
+    }
+  }
+
+  exit(graph: Graph) {
+    graph.popUniforms();
   }
 }

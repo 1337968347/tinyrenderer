@@ -6,6 +6,7 @@ import { vertShader, fragShader } from './shader';
 import { Clock } from './engine/utils';
 import CameraController from './engine/control/cameraController';
 import InputHandler from './engine/control/input';
+import { Matrix4 } from 'three';
 
 let globalUniform: uniformsProp = {};
 
@@ -14,8 +15,8 @@ let clock = null;
 let cameraController: CameraController;
 let camera: Scene.Camera;
 const canvasEl = document.querySelector('canvas');
-canvasEl.width = 256;
-canvasEl.height = 256;
+canvasEl.width = 512;
+canvasEl.height = 512;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler;
 
@@ -25,14 +26,22 @@ const prepareScene = () => {
   inputHandler = new InputHandler(canvasEl);
   cameraController = new CameraController(inputHandler, camera);
   const rabbitPragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
-  const rabertMesh = new Scene.Mesh();
-  const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertMesh]);
+  const rabertTransform = new Scene.Transform([new Scene.Mesh()]);
+  const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertTransform]);
   camera.append(baseMaterial);
   graph.append(camera);
+
+  // camera.position.set(0, 0, -2);
+  rabertTransform.wordMatrix = new Matrix4().makeScale(200, 200, 200);
 };
+let time = 0;
 const tick = (_time: number) => {
-  cameraController.tick();
-  graph.tick();
+  time += _time;
+  if (time > 1) {
+    cameraController.tick();
+    graph.tick();
+    time = 0;
+  }
 };
 prepareScene();
 clock = new Clock();
