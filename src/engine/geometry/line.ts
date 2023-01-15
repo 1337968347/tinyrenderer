@@ -1,4 +1,4 @@
-import { Vector, coor2index } from './index';
+import { Vector } from './index';
 
 class Line {
   sp: Vector;
@@ -10,8 +10,7 @@ class Line {
 }
 
 // 直线光栅化算法 y = mx + y0
-const rasterize_line = (x0: number, y0: number, x1: number, y1: number, imageData: ImageData) => {
-  const { data, width, height } = imageData;
+const rasterize_line = (x0: number, y0: number, x1: number, y1: number, width: number, height: number) => {
   const steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
   let temp;
   // 是否m >1
@@ -46,9 +45,9 @@ const rasterize_line = (x0: number, y0: number, x1: number, y1: number, imageDat
     yStep = -1;
   }
 
+  const linePlots: { x: number; y: number }[] = [];
   const plot = (x: number, y: number) => {
-    const index = coor2index(x, y, width, height);
-    data[index + 3] = 255;
+    linePlots.push({ x, y });
   };
 
   for (let x = x0; x < x1; x++) {
@@ -64,6 +63,8 @@ const rasterize_line = (x0: number, y0: number, x1: number, y1: number, imageDat
       error += deltaX;
     }
   }
+
+  return linePlots;
 };
 
 export { Line, rasterize_line };

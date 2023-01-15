@@ -1,5 +1,5 @@
 import { Vector4 } from 'three';
-import { inside_Triangle, Trangle, lerp_Triangle_UV } from '../geometry';
+import { inside_Triangle, Trangle, lerp_Triangle_UV, rasterize_line } from '../geometry';
 import { clamp } from '../utils';
 
 type rasterizationPipelineProps = {
@@ -12,6 +12,7 @@ type rasterizationPipelineProps = {
 
 /**
  * 光栅化三角形
+ * 包围盒 + 相邻叉乘判断Z
  * 离散化
  * @param glPosition nds 标准成像空间 三角形
  * @param i 三角形下标
@@ -19,7 +20,7 @@ type rasterizationPipelineProps = {
  * @param height
  * @returns trangleFragments 三角形光栅化后对应的片元数据
  */
-const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, height: number) => {
+const rasterize_TriangleOld = (glPosition: Trangle[], i: number, width: number, height: number) => {
   // 这个三角形的片元数据
   const trangleFragments: FragmentData[] = [];
   const [a, b, c] = glPosition[i].points;
@@ -57,6 +58,93 @@ const rasterize_Triangle = (glPosition: Trangle[], i: number, width: number, hei
   return trangleFragments;
 };
 
+// y-x 算法(y-x algorithm)，
+// 该算法为每条扫描线创建一个吊桶。随着算法对多边形边线的处理，边线与扫描线的交点放置在相应的吊桶中。
+// 在每个吊桶中，使用插入排序方法对每条扫描线上的交点序列的x坐标值进行排序
+const yx = (A: Vector4, B: Vector4, C: Vector4, width: number, height: number, trangleIdx: number) => {
+  const plotAB = rasterize_line(A.x, A.y, B.x, B.y, width, height);
+  const plotAC = rasterize_line(A.x, A.y, C.x, C.y, width, height);
+  const plotBC = rasterize_line(B.x, B.y, C.x, C.y, width, height);
+  // 三角形的边框点
+  const borderPlots = plotAB.concat(plotAC).concat(plotBC);
+  let minY = Math.min(A.y, B.y, C.y) | 0;
+  let maxY = (Math.max(A.y, B.y, C.y) | 0) + 1;
+  borderPlots.map(plot => {
+    minY = Math.min(plot.y | 0, minY);
+    maxY = Math.max((plot.y | 0) + 1, maxY);
+  });
+
+  let startY = minY;
+
+  // y - x 二维链表
+  const linkList = new Array(maxY - minY);
+  for (let i = 0; i < linkList.length; i++) {
+    linkList[i] = [];
+  }
+
+  borderPlots.map(plot => {
+    const { x, y } = plot;
+    const curY = y | 0;
+
+    const yIdx = curY - startY;
+    if (linkList[yIdx].length == 0) {
+      linkList[yIdx].push(x | 0);
+    } else if (linkList[yIdx].length == 1) {
+      //  按照x的大小排序
+      if (linkList[yIdx][0] > x) {
+        linkList[yIdx] = [x, linkList[yIdx][0]];
+      } else if (linkList[yIdx][0] < x) {
+        linkList[yIdx] = [linkList[yIdx][0], x];
+      } else {
+        // 相等不处理
+      }
+    }
+  });
+  // 针对Y - X 链表 生成片元数据
+  // 这个三角形的片元数据 不带UV
+  const trangleFragments: FragmentData[] = [];
+  for (let i = 0; i < linkList.length; i++) {
+    if (linkList[i].length == 1) {
+      continue;
+    }
+    const [x1, x2] = linkList[i];
+
+    for (let j = x1 | 0; j < (x2 | 0); j++) {
+      trangleFragments.push({
+        x: j,
+        y: i + startY,
+        trangleIdx,
+      });
+    }
+  }
+  // 加 0.5把 [-0.5, -0.5] 映射到 [0, 1]
+  const a = new Vector4((A.x + 0.5) * width, (A.y + 0.5) * height, 0, 1.0);
+  const b = new Vector4((B.x + 0.5) * width, (B.y + 0.5) * height, 0, 1.0);
+  const c = new Vector4((C.x + 0.5) * width, (C.y + 0.5) * height, 0, 1.0);
+  return { trangleFragments, pixTrangle: new Trangle([a, b, c]) };
+};
+
+/**
+ * 三角形光栅化
+ * 扫描线填充算法
+ * @param glPosition nds 标准成像空间 三角形
+ * @param i 三角形下标
+ * @param width
+ * @param height
+ * @returns trangleFragments 三角形光栅化后对应的片元数据
+ */
+const rasterize_Triangle = (glPosition: Trangle[], trangleIdx: number, width: number, height: number) => {
+  const [a, b, c] = glPosition[trangleIdx].points;
+  // 加 0.5把 [-0.5, -0.5] 映射到 [0, 1]
+  const A = new Vector4((a.x + 0.5) * width, (a.y + 0.5) * height, 0, 1.0);
+  const B = new Vector4((b.x + 0.5) * width, (b.y + 0.5) * height, 0, 1.0);
+  const C = new Vector4((c.x + 0.5) * width, (c.y + 0.5) * height, 0, 1.0);
+
+  const { trangleFragments, pixTrangle } = yx(A, B, C, width, height, trangleIdx);
+
+  return { trangleFragments, pixTrangle };
+};
+
 /**
  * 光栅化 生成片元数据
  * @param props
@@ -78,10 +166,11 @@ const rasterizationPipeline = (props: rasterizationPipelineProps): FragmentData[
   // 每个图元
   for (let i = 0; i < glPosition.length; i++) {
     // 这个三角形光栅化后的片元数据
-    const triangleFragments = rasterize_Triangle(glPosition, i, width, height);
+    const { trangleFragments, pixTrangle } = rasterize_Triangle(glPosition, i, width, height);
     // 每个片元
-    for (let n = 0; n < triangleFragments.length; n++) {
-      const temp = triangleFragments[n];
+    for (let n = 0; n < trangleFragments.length; n++) {
+      const temp = trangleFragments[n];
+
       const offset = temp.y * width + temp.x;
       const fragment = FRAGMENTDATAS[offset];
       // z深度测试 并且保存下标以及uv值

@@ -12,8 +12,8 @@ declare global {
   type FragmentData = {
     x?: number;
     y?: number;
-    u: number;
-    v: number;
+    u?: number;
+    v?: number;
     trangleIdx: number;
     z?: number;
     primitiveData?: { [key: string]: Vector4 };

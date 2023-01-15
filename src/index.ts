@@ -34,17 +34,12 @@ const prepareScene = () => {
   // camera.position.set(0, 0, -2);
   rabertTransform.wordMatrix = new Matrix4().makeScale(200, 200, 200);
 };
-let time = 0;
 const tick = (_time: number) => {
-  time += _time;
-  if (time > 1) {
-    cameraController.tick();
-    graph.tick();
-    time = 0;
-  }
+  cameraController.tick();
+  graph.tick();
 };
 prepareScene();
 clock = new Clock();
 clock.setOnTick(tick);
 clock.start();
-// clock.stop();
+clock.stop();
