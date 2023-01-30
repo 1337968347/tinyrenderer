@@ -45,7 +45,7 @@ class Trangle {
  * @param trangle 三角形
  * @param p 三角形平面内一点p
  */
-const getUV = (trangle: Trangle, p: Vector4) => {
+const getTrangleUV = (trangle: Trangle, p: Vector4) => {
   const [A, B, C] = trangle.points;
   const AP = { x: p.x - A.x, y: p.y - A.y };
   const AB = { x: B.x - A.x, y: B.y - A.y };
@@ -77,8 +77,8 @@ const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
  * @param p
  */
 const inside_Triangle = (trangle: Trangle, p: Vector4) => {
-  const { u, v } = getUV(trangle, p);
+  const { u, v } = getTrangleUV(trangle, p);
   return { u, v, inside: 0 <= u && u <= 1 && v >= 0 && v <= 1 };
 };
 
-export { Trangle, inside_Triangle, lerp_Triangle_UV, getUV };
+export { Trangle, inside_Triangle, lerp_Triangle_UV, getTrangleUV };

@@ -10,7 +10,7 @@ class Line {
 }
 
 // 直线光栅化算法 y = mx + y0
-const rasterize_line = (x0: number, y0: number, x1: number, y1: number, width: number, height: number) => {
+const rasterize_line = (x0: number, y0: number, x1: number, y1: number) => {
   const steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
   let temp;
   // 是否m >1
@@ -47,7 +47,7 @@ const rasterize_line = (x0: number, y0: number, x1: number, y1: number, width: n
 
   const linePlots: { x: number; y: number }[] = [];
   const plot = (x: number, y: number) => {
-    linePlots.push({ x, y });
+    linePlots.push({ x: x | 0, y: y | 0 });
   };
 
   for (let x = x0; x < x1; x++) {

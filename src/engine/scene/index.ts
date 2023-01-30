@@ -130,7 +130,7 @@ export class Mesh extends SceneNode {
   }
 
   enter(graph: Graph): void {
-    const frameBufferData = graph.ctx.getImageData(0, 0, graph.viewPort.width, graph.viewPort.height);
+    const frameBufferData = new ImageData(graph.viewPort.width, graph.viewPort.height);
 
     const shaderProgram = graph.getProgram();
     shaderProgram.bindFrameBuffer(frameBufferData);
@@ -213,12 +213,12 @@ export class Transform extends SceneNode {
   }
 
   enter(graph: Graph): void {
-    graph.pushUniforms();
     if (graph.uniform.modelView) {
       graph.uniform.modelView = graph.uniform.modelView.multiply(this.wordMatrix);
     } else {
       graph.uniform.modelView = new Matrix4().copy(this.wordMatrix);
     }
+    graph.pushUniforms();
   }
 
   exit(graph: Graph) {
