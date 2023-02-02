@@ -183,7 +183,7 @@ export class Camera extends SceneNode {
     const mvp = new Matrix4().multiplyMatrices(this.perspective(), this.getWorldView());
     const p = point.applyMatrix4(mvp);
     // 透视除法
-    p.multiplyScalar(1 / p.z);
+    p.multiplyScalar(1 / p.w);
     return p;
   }
 

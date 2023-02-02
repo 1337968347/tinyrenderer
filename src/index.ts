@@ -32,7 +32,7 @@ const prepareScene = () => {
   graph.append(camera);
 
   camera.position.set(0, 0, 0);
-  rabertTransform.wordMatrix = new Matrix4().identity();
+  rabertTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4);
 };
 const tick = (_time: number) => {
   cameraController.tick();

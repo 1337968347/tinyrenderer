@@ -1,4 +1,4 @@
-import { Vector4 } from 'three';
+import { Vector2, Vector4 } from 'three';
 
 // 三角形
 class Trangle {
@@ -45,8 +45,8 @@ class Trangle {
  * @param trangle 三角形
  * @param p 三角形平面内一点p
  */
-const getTrangleUV = (trangle: Trangle, p: Vector4) => {
-  const [A, B, C] = trangle.points;
+const getTrangleUV = (trangle: Vector2[], p: Vector2) => {
+  const [A, B, C] = trangle;
   const AP = { x: p.x - A.x, y: p.y - A.y };
   const AB = { x: B.x - A.x, y: B.y - A.y };
   const AC = { x: C.x - A.x, y: C.y - A.y };
@@ -76,7 +76,7 @@ const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
  * @param trangle
  * @param p
  */
-const inside_Triangle = (trangle: Trangle, p: Vector4) => {
+const inside_Triangle = (trangle: Vector2[], p: Vector2) => {
   const { u, v } = getTrangleUV(trangle, p);
   return { u, v, inside: 0 <= u && u <= 1 && v >= 0 && v <= 1 };
 };

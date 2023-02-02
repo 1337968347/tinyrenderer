@@ -1,5 +1,5 @@
-import { Vector4 } from 'three';
-import { inside_Triangle, Trangle, lerp_Triangle_UV, rasterize_line } from '../geometry';
+import { Vector2 } from 'three';
+import { getTrangleUV, Trangle, lerp_Triangle_UV, rasterize_line } from '../geometry';
 
 type rasterizationPipelineProps = {
   primitiveData: PrimitiveData;
@@ -60,68 +60,58 @@ type rasterizationPipelineProps = {
 // y-x 算法(y-x algorithm)，
 // 该算法为每条扫描线创建一个吊桶。随着算法对多边形边线的处理，边线与扫描线的交点放置在相应的吊桶中。
 // 在每个吊桶中，使用插入排序方法对每条扫描线上的交点序列的x坐标值进行排序
-const yx = (A: Vector4, B: Vector4, C: Vector4, trangleIdx: number) => {
+const yx = (A: Vector2, B: Vector2, C: Vector2, trangleIdx: number) => {
   const plotAB = rasterize_line(A.x, A.y, B.x, B.y);
   const plotAC = rasterize_line(A.x, A.y, C.x, C.y);
   const plotBC = rasterize_line(B.x, B.y, C.x, C.y);
   // 三角形的边框点
-  const borderPlots = plotAB.concat(plotAC).concat(plotBC);
-  let minY = Infinity;
-  let maxY = -Infinity;
-  borderPlots.map(plot => {
-    minY = Math.min(plot.y, minY);
-    maxY = Math.max(plot.y, maxY);
-  });
-
-  let startY = minY;
-
-  // y - x 二维链表
-  const linkList = new Array(maxY - minY + 1);
-  for (let i = 0; i < linkList.length; i++) {
-    linkList[i] = [];
-  }
-
-  borderPlots.map(plot => {
-    const { x, y } = plot;
-    const curY = y;
-
-    const yIdx = curY - startY;
-    if (linkList[yIdx].length == 0) {
-      linkList[yIdx].push(x);
-    } else if (linkList[yIdx].length == 1) {
-      //  按照x的大小排序
-      if (linkList[yIdx][0] > x) {
-        linkList[yIdx] = [x, linkList[yIdx][0]];
-      } else if (linkList[yIdx][0] < x) {
-        linkList[yIdx] = [linkList[yIdx][0], x];
+  const borderPlots = plotAB
+    .concat(plotAC)
+    .concat(plotBC)
+    .sort((a, b) => {
+      if (a.y === b.y) {
+        return a.x - b.x;
       } else {
-        // 相等不处理
+        return a.y - b.y;
       }
-    }
-  });
-  const pixTrangle = new Trangle([A, B, C]);
+    });
+
   // 针对Y - X 链表 生成片元数据
   // 这个三角形的片元数据 不带UV
   const trangleFragments: FragmentData[] = [];
-  for (let i = 0; i < linkList.length; i++) {
-    if (linkList[i].length == 1) {
+
+  if (borderPlots.length == 0) {
+    return trangleFragments;
+  }
+  let lastY = -Infinity;
+  let lastX = -Infinity;
+
+  const pushTrangleFragments = (x: number, y: number) => {
+    const { u, v } = getTrangleUV([A, B, C], new Vector2(x, y));
+    trangleFragments.push({
+      x,
+      y,
+      trangleIdx,
+      u,
+      v,
+    });
+  };
+
+  for (let i = 0; i < borderPlots.length; i++) {
+    const { x, y } = borderPlots[i];
+    if (lastX == x && lastY == y) {
       continue;
     }
-    const [x1, x2] = linkList[i];
-
-    for (let j = x1; j <= x2; j++) {
-      const x = j;
-      const y = i + startY;
-      const { u, v, inside } = inside_Triangle(pixTrangle, new Vector4(x, y, 0, 1));
-      if (inside) {
-        trangleFragments.push({
-          x,
-          y,
-          trangleIdx,
-          u,
-          v,
-        });
+    if (lastY == y && lastX != x) {
+      for (let xx = lastX + 1; xx <= x; xx++) {
+        pushTrangleFragments(xx, y);
       }
+      lastX = x;
+    }
+    if (lastY !== y) {
+      lastY = y;
+      lastX = x;
+      pushTrangleFragments(x, y);
     }
   }
   return trangleFragments;
@@ -139,9 +129,9 @@ const yx = (A: Vector4, B: Vector4, C: Vector4, trangleIdx: number) => {
 const rasterize_Triangle = (glPosition: Trangle[], trangleIdx: number, width: number, height: number) => {
   const [a, b, c] = glPosition[trangleIdx].points;
   // 加 0.5把 [-0.5, -0.5] 映射到 [0, 1]
-  const A = new Vector4((a.x + 0.5) * width, (a.y + 0.5) * height, 0, 1.0);
-  const B = new Vector4((b.x + 0.5) * width, (b.y + 0.5) * height, 0, 1.0);
-  const C = new Vector4((c.x + 0.5) * width, (c.y + 0.5) * height, 0, 1.0);
+  const A = new Vector2((a.x + 0.5) * width, (a.y + 0.5) * height);
+  const B = new Vector2((b.x + 0.5) * width, (b.y + 0.5) * height);
+  const C = new Vector2((c.x + 0.5) * width, (c.y + 0.5) * height);
 
   const trangleFragments = yx(A, B, C, trangleIdx);
 

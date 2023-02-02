@@ -29,7 +29,7 @@ class ShaderProgram {
     const { data, width, height } = this.frameBufferData;
     const { attributes, vertShader, zBuffer, fragShader } = this;
     zBuffer.fill(-Infinity);
-    data.fill(255);
+    data.fill(0);
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装

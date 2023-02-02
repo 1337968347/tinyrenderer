@@ -1,9 +1,13 @@
 import { Vector4, Vector3 } from 'three';
 import { Trangle, BBox } from '../geometry';
+// 透视除法
+import { divisionPipeline } from './division';
 
 // 图元组装
 // 拼成三角形->
 const primitiveMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
+  // 透视除法
+  divisionPipeline(gl_positions);
   const { primitiveVaryingData, primitiveGlPosition } = makeTrangle(attribute, gl_positions);
   // 裁剪处理 (背面剔除, 视锥体剔除)
   croppingPipeline(primitiveVaryingData, primitiveGlPosition);

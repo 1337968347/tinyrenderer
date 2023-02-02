@@ -12,7 +12,7 @@ class Texture2D {
     const { width, height, data } = this.imageData;
     const x = (width * u) | 0;
     const y = (height * v) | 0;
-    const i = (y * width + x) * 4;
+    const i = (y * width + x) << 2;
     return new Vector4(data[i], data[i + 1], data[i + 2], data[i + 3]);
   }
 }
