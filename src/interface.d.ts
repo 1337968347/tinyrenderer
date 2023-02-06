@@ -28,7 +28,13 @@ declare global {
     gl_positions: Vector4[];
   };
 
-  type DivisionPipeline = (position: Vector4[]) => void;
+  type rasterizationPipelineProps = {
+    tragles: Trangle[];
+    zBuffer: Float32Array;
+    imageData: ImageData;
+    FRAGMENTDATAS: FragmentData[];
+    fragShader: FragShader;
+  };
 
   type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader: FragShader }) => void;
   type ProgramProp = {
@@ -36,6 +42,44 @@ declare global {
     vertShader: VertShader;
     fragShader: FragShader;
     frameBufferData: ImageData;
+  };
+
+  type Texcoord_t = {
+    u: number;
+    v: number;
+  };
+
+  type Color_t = {
+    r: number;
+    g: number;
+    b: number;
+  };
+
+  type Vertex_t = {
+    pos: Vector4;
+    rhw: number;
+    primaryData: { [key: string]: Vector4 };
+  };
+
+  type Edge_t = {
+    v?: Vertex_t;
+    v1: Vertex_t;
+    v2: Vertex_t;
+  };
+
+  type Trapezoid_t = {
+    top: number;
+    bottom: number;
+    left: Edge_t;
+    right: Edge_t;
+  };
+
+  type Scanline_t = {
+    v?: Vertex_t;
+    step: Vertex_t;
+    x: number;
+    y: number;
+    w: number;
   };
 
   type TickFunc = (time: number) => void;

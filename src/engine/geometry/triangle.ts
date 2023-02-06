@@ -6,11 +6,11 @@ class Trangle {
    *
    * @param points: Float32Array[3]
    */
-  constructor(points: Vector4[]) {
+  constructor(points: Vertex_t[]) {
     this.points = points;
   }
 
-  points: Vector4[];
+  points: Vertex_t[];
 }
 
 // /**
@@ -68,7 +68,12 @@ const getTrangleUV = (trangle: Vector2[], p: Vector2) => {
 const lerp_Triangle_UV = (trangle: Trangle, u: number, v: number) => {
   const [A, B, C] = trangle.points;
   const t = 1 - u - v;
-  return new Vector4(t * C.x + u * A.x + v * B.x, t * C.y + u * A.y + v * B.y, t * C.z + u * A.z + v * B.z, t * C.w + u * A.w + v * B.w);
+  return new Vector4(
+    t * C.pos.x + u * A.pos.x + v * B.pos.x,
+    t * C.pos.y + u * A.pos.y + v * B.pos.y,
+    t * C.pos.z + u * A.pos.z + v * B.pos.z,
+    t * C.pos.w + u * A.pos.w + v * B.pos.w,
+  );
 };
 
 /**

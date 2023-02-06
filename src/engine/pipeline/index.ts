@@ -4,11 +4,10 @@ import { vertPipeline } from './vert';
 import { primitiveMakePipeline } from './primitive';
 // 光栅化
 import { rasterizationPipeline } from './rasterization';
-// 片元着色器
-import { fragPipeline } from './frag';
 
 class ShaderProgram {
   zBuffer: Float32Array;
+  FRAGMENTDATAS: FragmentData[];
   frameBufferData: ImageData;
   attributes: attributeProps;
   vertShader: VertShader;
@@ -22,22 +21,31 @@ class ShaderProgram {
   bindFrameBuffer(frameBufferData: ImageData) {
     const { width, height } = frameBufferData;
     this.zBuffer = new Float32Array(width * height);
+    if (this.FRAGMENTDATAS.length !== this.zBuffer.length) {
+      // 帧缓存数据
+      const FRAGMENTDATAS: FragmentData[] = new Array(this.zBuffer.length);
+      for (let i = 0; i < this.zBuffer.length; i++) {
+        FRAGMENTDATAS[i] = {
+          u: 0,
+          v: 0,
+          trangleIdx: -1,
+        };
+      }
+    }
     this.frameBufferData = frameBufferData;
   }
 
   draw(uniforms: uniformsProp) {
-    const { data, width, height } = this.frameBufferData;
     const { attributes, vertShader, zBuffer, fragShader } = this;
     zBuffer.fill(-Infinity);
-    data.fill(0);
     // 顶点着色器
     const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装
-    const { primitiveVaryingData, primitiveGlPosition } = primitiveMakePipeline(varyings, gl_positions);
+    const tragles = primitiveMakePipeline(varyings, gl_positions);
+    this.frameBufferData.data.fill(0);
     // 光栅化（图元数据 => 片元数据）
-    const fragmentData = rasterizationPipeline({ primitiveData: primitiveVaryingData, glPosition: primitiveGlPosition, width: width, height: height, zBuffer });
-    // 片元光栅化
-    fragPipeline({ fragmentData, zBuffer, data, fragShader });
+    rasterizationPipeline({ tragles, zBuffer, imageData: this.frameBufferData, fragShader });
   }
 }
+
 export { ShaderProgram };
