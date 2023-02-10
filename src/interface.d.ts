@@ -23,10 +23,7 @@ declare global {
 
   type FragShader = (fragmentData: FragmentData, gl_FragColor: Vector4) => void;
 
-  type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => {
-    varyings: attributeProps;
-    gl_positions: Vector4[];
-  };
+  type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => Vertex_t[];
 
   type rasterizationPipelineProps = {
     tragles: Trangle[];

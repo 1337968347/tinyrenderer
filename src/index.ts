@@ -35,6 +35,7 @@ const prepareScene = () => {
   rabertTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4);
 };
 const tick = (_time: number) => {
+  // console.log(_time);
   cameraController.tick();
   graph.tick();
 };

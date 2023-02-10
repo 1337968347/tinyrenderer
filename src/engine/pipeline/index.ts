@@ -7,7 +7,7 @@ import { rasterizationPipeline } from './rasterization';
 
 class ShaderProgram {
   zBuffer: Float32Array;
-  FRAGMENTDATAS: FragmentData[];
+  FRAGMENTDATAS: FragmentData[] = [];
   frameBufferData: ImageData;
   attributes: attributeProps;
   vertShader: VertShader;
@@ -31,6 +31,7 @@ class ShaderProgram {
           trangleIdx: -1,
         };
       }
+      this.FRAGMENTDATAS = FRAGMENTDATAS;
     }
     this.frameBufferData = frameBufferData;
   }
@@ -39,12 +40,12 @@ class ShaderProgram {
     const { attributes, vertShader, zBuffer, fragShader } = this;
     zBuffer.fill(-Infinity);
     // 顶点着色器
-    const { varyings, gl_positions } = vertPipeline({ attributes, uniforms, vertShader });
+    const verts = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装
-    const tragles = primitiveMakePipeline(varyings, gl_positions);
+    const tragles = primitiveMakePipeline(verts);
     this.frameBufferData.data.fill(0);
     // 光栅化（图元数据 => 片元数据）
-    rasterizationPipeline({ tragles, zBuffer, imageData: this.frameBufferData, fragShader });
+    rasterizationPipeline({ tragles, zBuffer, FRAGMENTDATAS: this.FRAGMENTDATAS, imageData: this.frameBufferData, fragShader });
   }
 }
 

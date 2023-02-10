@@ -3,29 +3,30 @@ import { Trangle, BBox } from '../geometry';
 
 // 图元组装
 // 拼成三角形->
-const primitiveMakePipeline = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
+const primitiveMakePipeline = (verts: Vertex_t[]) => {
+  divisionVerts(verts);
   // 透视除法
-  const tragles = makeTrangle(attribute, gl_positions);
+  const tragles = makeTrangle(verts);
   // 裁剪处理 (背面剔除, 视锥体剔除)
   croppingPipeline(tragles);
   return tragles;
 };
 
+/**
+ * 透视除法
+ * @param verts
+ */
+const divisionVerts = (verts: Vertex_t[]) => {
+  for (let i = 0; i < verts.length; i++) {
+    verts[i].pos = verts[i].pos.multiplyScalar(verts[i].rhw);
+  }
+};
+
 // 顶点拼成三角形
-const makeTrangle = (attribute: { [key: string]: Vector4[] }, gl_positions: Vector4[]) => {
+const makeTrangle = (verts: Vertex_t[]) => {
   const tragles: Trangle[] = [];
-  let tragle: Vertex_t[] = [];
-  for (let i = 0; i < gl_positions.length; i++) {
-    const primaryData = {};
-    for (let key in attribute) {
-      primaryData[key] = attribute[key][i];
-    }
-    const vert: Vertex_t = { rhw: gl_positions[i].w, pos: gl_positions[i], primaryData };
-    tragle.push(vert);
-    if (tragle.length == 3) {
-      tragles.push(new Trangle(tragle));
-      tragle = [];
-    }
+  for (let i = 0; i < verts.length; i += 3) {
+    tragles.push(new Trangle([verts[i], verts[i + 1], verts[i + 2]]));
   }
   return tragles;
 };

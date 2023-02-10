@@ -20,8 +20,8 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   vWorldPosition.applyMatrix4(modelView as Matrix4);
   gl_position.applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数
-  varyings['vNormal'].push(vNormal);
-  varyings['vWorldPosition'].push(vWorldPosition);
+  varyings['vNormal'] = vNormal;
+  varyings['vWorldPosition'] = vWorldPosition;
 
   return { gl_position };
 };
