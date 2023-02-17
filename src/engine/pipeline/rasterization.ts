@@ -1,10 +1,12 @@
 import { Vector2, Vector4 } from 'three';
 import { getTrangleUV, Trangle, lerp_Triangle_UV, rasterize_line } from '../geometry';
 
+// 数值插值
 const interp = (x1: number, x2: number, t: number) => {
   return x1 + (x2 - x1) * t;
 };
 
+// 向量插值
 const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
   z.x = interp(x1.x, x2.x, t);
   z.y = interp(x1.y, x2.y, t);
@@ -12,6 +14,7 @@ const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
   z.w = 1.0;
 };
 
+// 顶点插值
 const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
   vector_Interp(z.pos, x1.pos, x2.pos, t);
   for (let key in x1.primaryData) {
@@ -19,6 +22,24 @@ const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
     vector_Interp(z.primaryData[key], x1.primaryData[key], x2.primaryData[key], t);
   }
   z.rhw = interp(x1.rhw, x2.rhw, t);
+};
+
+// 透视除法
+const vertex_division = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, w: number) => {
+  const inv = 1 / w;
+  z.pos.x = (x2.pos.x - x1.pos.x) * inv;
+  z.pos.y = (x2.pos.y - x1.pos.y) * inv;
+  z.pos.z = (x2.pos.z - x1.pos.z) * inv;
+  z.pos.w = (x2.pos.w - x1.pos.w) * inv;
+  z.rhw = (x2.rhw - x1.rhw) * inv;
+
+  for (let key in x1.primaryData) {
+    z.primaryData[key] = new Vector4();
+    z.primaryData[key].x = (x2.primaryData[key].x - x1.primaryData[key].x) * inv;
+    z.primaryData[key].y = (x2.primaryData[key].y - x1.primaryData[key].y) * inv;
+    z.primaryData[key].z = (x2.primaryData[key].z - x1.primaryData[key].z) * inv;
+    z.primaryData[key].w = (x2.primaryData[key].w - x1.primaryData[key].w) * inv;
+  }
 };
 
 /**
@@ -98,6 +119,7 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
   return [topTrap, bottomTrap];
 };
 
+// 根据Y坐标算出左右两条边纵坐标等于Y的顶点
 const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
   const s1 = trap.left.v2.pos.y - trap.left.v1.pos.y;
   const s2 = trap.right.v2.pos.y - trap.right.v1.pos.y;
@@ -108,14 +130,43 @@ const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
   vertex_Interp(trap.right.v, trap.right.v1, trap.right.v2, t2);
 };
 
-const render_trap = (imageData: ImageData, trap: Trapezoid_t) => {
+// 根据左右两边的断点
+const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: number) => {
+  const width = trap.right.v.pos.x - trap.left.v.pos.x;
+  scanline.x = (trap.left.v.pos.x + 0.5) | 0;
+  // TODO 为什么不直接用width
+  scanline.w = ((trap.right.v.pos.x + 0.5) | 0) - scanline.x;
+  scanline.y = y;
+  scanline.v = trap.left.v;
+  if (trap.left.v.pos.x >= trap.right.v.pos.x) scanline.w = 0;
+  vertex_division(scanline.step, trap.left.v, trap.right.v, width);
+};
+
+const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t) => {
+  const { width, height, data } = imageData;
+
+};
+
+const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoid_t) => {
+  // 扫描线
+  const scanline: Scanline_t = {
+    x: 0,
+    y: 0,
+    w: 0,
+    step: {
+      pos: new Vector4(),
+      rhw: 0,
+      primaryData: {},
+    },
+  };
   const top = trap.top + 0.5;
   const bottom = trap.bottom + 0.5;
   for (let i = top; i < bottom; i++) {
     if (i >= 0 && i < imageData.height) {
       // 初始化trap两条边的Vertex
-      trapezoid_edge_interp(trap, i);
-      
+      trapezoid_edge_interp(trap, i + 0.5);
+      trapezoid_init_scan_line(trap, scanline, i);
+      device_draw_scanline(imageData, zBuffer, trap);
     }
   }
 };
