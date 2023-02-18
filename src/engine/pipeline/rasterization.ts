@@ -24,7 +24,6 @@ const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
   z.rhw = interp(x1.rhw, x2.rhw, t);
 };
 
-// 透视除法
 const vertex_division = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, w: number) => {
   const inv = 1 / w;
   z.pos.x = (x2.pos.x - x1.pos.x) * inv;
@@ -39,6 +38,22 @@ const vertex_division = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, w: number) => 
     z.primaryData[key].y = (x2.primaryData[key].y - x1.primaryData[key].y) * inv;
     z.primaryData[key].z = (x2.primaryData[key].z - x1.primaryData[key].z) * inv;
     z.primaryData[key].w = (x2.primaryData[key].w - x1.primaryData[key].w) * inv;
+  }
+};
+
+const vertex_add = (y: Vertex_t, x: Vertex_t) => {
+  y.pos.x += x.pos.x;
+  y.pos.y += x.pos.y;
+  y.pos.z += x.pos.z;
+  y.pos.w += x.pos.w;
+  y.rhw += x.rhw;
+
+  for (let key in y.primaryData) {
+    y.primaryData[key] = new Vector4();
+    y.primaryData[key].x += x.primaryData[key].x;
+    y.primaryData[key].y += x.primaryData[key].y;
+    y.primaryData[key].z += x.primaryData[key].z;
+    y.primaryData[key].w += x.primaryData[key].w;
   }
 };
 
@@ -142,9 +157,21 @@ const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: nu
   vertex_division(scanline.step, trap.left.v, trap.right.v, width);
 };
 
-const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t) => {
+const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
   const { width, height, data } = imageData;
-
+  let { x, w } = scanline;
+  const gl_FragColor = new Vector4();
+  // 下标偏移
+  const idx = scanline.y * width;
+  for (; w > 0; x++, w--) {
+    if (x > 0 || x < w) {
+      const offset = idx + x;
+      if (scanline.v.rhw > zBuffer[offset]) {
+        zBuffer[offset] = scanline.v.rhw;
+        fragShader(scanline.v, uniforms, gl_FragColor);
+      }
+    }
+  }
 };
 
 const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoid_t) => {
@@ -166,7 +193,7 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
       // 初始化trap两条边的Vertex
       trapezoid_edge_interp(trap, i + 0.5);
       trapezoid_init_scan_line(trap, scanline, i);
-      device_draw_scanline(imageData, zBuffer, trap);
+      device_draw_scanline(imageData, zBuffer, scanline);
     }
   }
 };

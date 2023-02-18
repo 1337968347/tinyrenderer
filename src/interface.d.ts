@@ -21,7 +21,7 @@ declare global {
 
   type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps) => { gl_position: Vector4 };
 
-  type FragShader = (fragmentData: FragmentData, gl_FragColor: Vector4) => void;
+  type FragShader = (vary: Vertex_t, uniforms: uniformsProp, gl_FragColor: GL_FragColor) => void;
 
   type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => Vertex_t[];
 
@@ -40,6 +40,8 @@ declare global {
     fragShader: FragShader;
     frameBufferData: ImageData;
   };
+
+  type GL_FragColor = Vector4;
 
   type Texcoord_t = {
     u: number;
