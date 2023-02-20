@@ -8,16 +8,6 @@ declare global {
   type uniformsProp = { modelView?: Matrix4; [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
-  // 片元数据
-  type FragmentData = {
-    x?: number;
-    y?: number;
-    u?: number;
-    v?: number;
-    trangleIdx: number;
-    z?: number;
-    primitiveData?: { [key: string]: Vector4 };
-  };
 
   type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps) => { gl_position: Vector4 };
 
@@ -29,11 +19,10 @@ declare global {
     tragles: Trangle[];
     zBuffer: Float32Array;
     imageData: ImageData;
-    FRAGMENTDATAS: FragmentData[];
     fragShader: FragShader;
+    uniforms: uniformsProp;
   };
 
-  type FragPipeline = (props: { fragmentData: FragmentData[]; zBuffer: Float32Array; data: Uint8ClampedArray; fragShader: FragShader }) => void;
   type ProgramProp = {
     attributes: attributeProps;
     vertShader: VertShader;

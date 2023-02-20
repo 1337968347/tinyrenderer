@@ -1,5 +1,4 @@
 import { Matrix4, Vector4 } from 'three';
-import { FragmentData } from '../engine/pipeline/rasterization';
 
 /**
  * 顶点变换 着色器
@@ -26,9 +25,9 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   return { gl_position };
 };
 
-const fragShader = (fragmentData: FragmentData, gl_FragColor: Vector4) => {
-  const { primitiveData } = fragmentData;
-  let { vNormal } = primitiveData;
+const fragShader = (frag: Vertex_t, _uniforms: uniformsProp, gl_FragColor: Vector4) => {
+  const { primaryData } = frag;
+  let { vNormal } = primaryData;
   vNormal.normalize();
   const diffuse = Math.max(vNormal.dot(new Vector4(0, -1, 0, 1)), 0);
   gl_FragColor.x = diffuse;

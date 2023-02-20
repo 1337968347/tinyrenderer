@@ -7,7 +7,6 @@ import { rasterizationPipeline } from './rasterization';
 
 class ShaderProgram {
   zBuffer: Float32Array;
-  FRAGMENTDATAS: FragmentData[] = [];
   frameBufferData: ImageData;
   attributes: attributeProps;
   vertShader: VertShader;
@@ -21,18 +20,7 @@ class ShaderProgram {
   bindFrameBuffer(frameBufferData: ImageData) {
     const { width, height } = frameBufferData;
     this.zBuffer = new Float32Array(width * height);
-    if (this.FRAGMENTDATAS.length !== this.zBuffer.length) {
-      // 帧缓存数据
-      const FRAGMENTDATAS: FragmentData[] = new Array(this.zBuffer.length);
-      for (let i = 0; i < this.zBuffer.length; i++) {
-        FRAGMENTDATAS[i] = {
-          u: 0,
-          v: 0,
-          trangleIdx: -1,
-        };
-      }
-      this.FRAGMENTDATAS = FRAGMENTDATAS;
-    }
+
     this.frameBufferData = frameBufferData;
   }
 
@@ -45,7 +33,7 @@ class ShaderProgram {
     const tragles = primitiveMakePipeline(verts);
     this.frameBufferData.data.fill(0);
     // 光栅化（图元数据 => 片元数据）
-    rasterizationPipeline({ tragles, zBuffer, FRAGMENTDATAS: this.FRAGMENTDATAS, imageData: this.frameBufferData, fragShader });
+    rasterizationPipeline({ tragles, zBuffer, imageData: this.frameBufferData, fragShader, uniforms });
   }
 }
 
