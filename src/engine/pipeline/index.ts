@@ -1,7 +1,7 @@
 // 顶点处理， 顶点变换
 import { vertPipeline } from './vert';
 // 图元组装
-import { primitiveMakePipeline } from './primitive';
+import { primitivePipeline } from './primitive';
 // 光栅化
 import { rasterizationPipeline } from './rasterization';
 
@@ -26,14 +26,14 @@ class ShaderProgram {
 
   draw(uniforms: uniformsProp) {
     const { attributes, vertShader, zBuffer, fragShader } = this;
-    zBuffer.fill(-Infinity);
     // 顶点着色器
-    const verts = vertPipeline({ attributes, uniforms, vertShader });
+    let verts: Vertex_t[] = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装
-    const tragles = primitiveMakePipeline(verts);
+    verts = primitivePipeline(verts, this.frameBufferData.width, this.frameBufferData.height);
+    zBuffer.fill(-Infinity);
     this.frameBufferData.data.fill(0);
     // 光栅化（图元数据 => 片元数据）
-    rasterizationPipeline({ tragles, zBuffer, imageData: this.frameBufferData, fragShader, uniforms });
+    rasterizationPipeline({ verts, zBuffer, imageData: this.frameBufferData, fragShader, uniforms });
   }
 }
 

@@ -1,3 +1,5 @@
+import { Vector4 } from 'three';
+
 const vertPipeline: VertPipeline = ({ attributes, uniforms, vertShader }) => {
   const { position } = attributes;
   if (position.length < 3) throw new Error('顶点数太少');
@@ -13,8 +15,9 @@ const vertPipeline: VertPipeline = ({ attributes, uniforms, vertShader }) => {
     for (let key in attributes) {
       attribute[key] = attributes[key][i];
     }
-    const { gl_position } = vertShader(attribute, uniforms, primaryData);
-    const vert: Vertex_t = { pos: gl_position, rhw: 1.0 / gl_position.w, primaryData };
+    const gl_position = new Vector4();
+    vertShader(attribute, uniforms, primaryData, gl_position);
+    const vert: Vertex_t = { pos: gl_position, rhw: 1, primaryData };
     verts.push(vert);
   }
 

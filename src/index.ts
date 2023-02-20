@@ -31,8 +31,8 @@ const prepareScene = () => {
   camera.append(baseMaterial);
   graph.append(camera);
 
-  camera.position.set(0, 0, 0);
-  rabertTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4);
+  camera.position.set(0, 0, 0.5);
+  rabertTransform.wordMatrix = new Matrix4().makeScale(1, 1, 1);
 };
 const tick = (_time: number) => {
   // console.log(_time);

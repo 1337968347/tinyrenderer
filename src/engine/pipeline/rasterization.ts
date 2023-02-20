@@ -147,33 +147,38 @@ const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
 
   vertex_Interp(trap.left.v, trap.left.v1, trap.left.v2, t1);
   vertex_Interp(trap.right.v, trap.right.v1, trap.right.v2, t2);
+  const width = trap.right.v.pos.x - trap.left.v.pos.x;
+  if (width > 10) {
+    debugger;
+  }
 };
 
 // 根据左右两边的断点
 const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: number) => {
   const width = trap.right.v.pos.x - trap.left.v.pos.x;
   scanline.x = (trap.left.v.pos.x + 0.5) | 0;
-  // TODO 为什么不直接用width
-  scanline.w = ((trap.right.v.pos.x + 0.5) | 0) - scanline.x;
+  scanline.w = ((trap.left.v.pos.x + 0.5) | 0) - scanline.x;
   scanline.y = y;
   scanline.v = trap.left.v;
   if (trap.left.v.pos.x >= trap.right.v.pos.x) scanline.w = 0;
+  // 初始化step
   vertex_division(scanline.step, trap.left.v, trap.right.v, width);
 };
 
 const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
   const { width, data } = imageData;
   let { x, w } = scanline;
-  const gl_FragColor = new Vector4();
+  let gl_FragColor = new Vector4();
   // 下标偏移
   const idx = (scanline.y | 0) * width;
   for (; w > 0; x++, w--) {
-    if (x > 0 || x < w) {
+    if (x > 0 && x < width) {
       const offset = idx + x;
       if (scanline.v.rhw > zBuffer[offset]) {
         zBuffer[offset] = scanline.v.rhw;
+        gl_FragColor = new Vector4();
         fragShader(scanline.v, uniforms, gl_FragColor);
-        const idxx = idx << 2;
+        const idxx = offset << 2;
         data[idxx] = gl_FragColor.x;
         data[idxx + 1] = gl_FragColor.y;
         data[idxx + 2] = gl_FragColor.z;
@@ -204,7 +209,6 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
       // 初始化trap两条边的Vertex
       trapezoid_edge_interp(trap, i + 0.5);
       trapezoid_init_scan_line(trap, scanline, i);
-      // TODO 性能优化 将渲染最终确定的片元
       device_draw_scanline(imageData, zBuffer, scanline, uniforms, fragShader);
     }
   }
@@ -216,14 +220,11 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
  * @returns
  */
 const rasterizationPipeline = (props: rasterizationPipelineProps) => {
-  const { tragles, zBuffer, imageData, fragShader, uniforms } = props;
-
+  const { verts, zBuffer, imageData, fragShader, uniforms } = props;
   // 每个图元
-  for (let i = 0; i < tragles.length; i++) {
-    const tragle = tragles[i];
-    const traps: Trapezoid_t[] = trapezoid_Init_Triangle(tragle.points[0], tragle.points[1], tragle.points[2]);
+  for (let i = 0; i < verts.length; i += 3) {
+    const traps: Trapezoid_t[] = trapezoid_Init_Triangle(verts[i], verts[i + 1], verts[i + 2]);
     for (let j = 0; j < traps.length; j++) {
-      if (!traps[j]) break;
       render_trap(imageData, zBuffer, traps[j], uniforms, fragShader);
     }
   }

@@ -9,14 +9,14 @@ declare global {
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
 
-  type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps) => { gl_position: Vector4 };
+  type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps, gl_position: Vector4) => void;
 
   type FragShader = (vary: Vertex_t, uniforms: uniformsProp, gl_FragColor: GL_FragColor) => void;
 
   type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => Vertex_t[];
 
   type rasterizationPipelineProps = {
-    tragles: Trangle[];
+    verts: Vertex_t[];
     zBuffer: Float32Array;
     imageData: ImageData;
     fragShader: FragShader;
