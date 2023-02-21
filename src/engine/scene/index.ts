@@ -203,7 +203,7 @@ export class Camera extends SceneNode {
     const rotateYMat4 = new Matrix4().makeRotationY(this.y);
     const rotateMat4 = new Matrix4().multiplyMatrices(rotateXMat4, rotateYMat4);
     const translateMat4 = new Matrix4().makeTranslation(-this.position.x, -this.position.y, -this.position.z);
-    return new Matrix4().multiplyMatrices(translateMat4, rotateMat4);
+    return new Matrix4().multiplyMatrices(rotateMat4, translateMat4);
   }
 }
 

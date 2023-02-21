@@ -53,7 +53,6 @@ const vertex_add = (y: Vertex_t, x: Vertex_t) => {
   y.rhw += x.rhw;
 
   for (let key in y.primaryData) {
-    y.primaryData[key] = new Vector4();
     y.primaryData[key].x += x.primaryData[key].x;
     y.primaryData[key].y += x.primaryData[key].y;
     y.primaryData[key].z += x.primaryData[key].z;
@@ -116,7 +115,8 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
     return [trap];
   }
 
-  const x = (p3.pos.x - p1.pos.x) * ((p3.pos.y - p1.pos.y) / (p2.pos.y - p1.pos.y));
+  const k = (p3.pos.y - p1.pos.y) / (p2.pos.y - p1.pos.y);
+  const x = p1.pos.x + (p2.pos.x - p1.pos.x) * k;
   let topTrap: Trapezoid_t, bottomTrap: Trapezoid_t;
 
   //      .
@@ -147,17 +147,13 @@ const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
 
   vertex_Interp(trap.left.v, trap.left.v1, trap.left.v2, t1);
   vertex_Interp(trap.right.v, trap.right.v1, trap.right.v2, t2);
-  const width = trap.right.v.pos.x - trap.left.v.pos.x;
-  if (width > 10) {
-    debugger;
-  }
 };
 
 // 根据左右两边的断点
 const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: number) => {
   const width = trap.right.v.pos.x - trap.left.v.pos.x;
   scanline.x = (trap.left.v.pos.x + 0.5) | 0;
-  scanline.w = ((trap.left.v.pos.x + 0.5) | 0) - scanline.x;
+  scanline.w = ((trap.right.v.pos.x + 0.5) | 0) - scanline.x;
   scanline.y = y;
   scanline.v = trap.left.v;
   if (trap.left.v.pos.x >= trap.right.v.pos.x) scanline.w = 0;
@@ -202,8 +198,8 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
       primaryData: {},
     },
   };
-  const top = trap.top + 0.5;
-  const bottom = trap.bottom + 0.5;
+  const top = (trap.top + 0.5) | 0;
+  const bottom = (trap.bottom + 0.5) | 0;
   for (let i = top; i < bottom; i++) {
     if (i >= 0 && i < imageData.height) {
       // 初始化trap两条边的Vertex

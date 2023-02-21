@@ -19,6 +19,8 @@ canvasEl.width = 512;
 canvasEl.height = 512;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler;
+let rabertTransform: Scene.Transform;
+let robertRoteteY = 0;
 
 const prepareScene = () => {
   const attributes = getPosAndNormal(bunnyStr);
@@ -26,16 +28,17 @@ const prepareScene = () => {
   inputHandler = new InputHandler(canvasEl);
   cameraController = new CameraController(inputHandler, camera);
   const rabbitPragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
-  const rabertTransform = new Scene.Transform([new Scene.Mesh()]);
+  rabertTransform = new Scene.Transform([new Scene.Mesh()]);
   const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertTransform]);
   camera.append(baseMaterial);
   graph.append(camera);
 
-  camera.position.set(0, 0, 0.5);
-  rabertTransform.wordMatrix = new Matrix4().makeScale(1, 1, 1);
+  camera.position.set(0, 0, 3);
 };
 const tick = (_time: number) => {
-  // console.log(_time);
+  console.log(_time)
+  robertRoteteY += _time;
+  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, -5, 5), new Matrix4().makeRotationY(robertRoteteY));
   cameraController.tick();
   graph.tick();
 };

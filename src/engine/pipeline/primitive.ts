@@ -4,7 +4,12 @@ import { Vector4 } from 'three';
 const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => {
   const cropVerts: Vertex_t[] = [];
   for (let i = 0; i < verts.length; i += 3) {
-    if (transform_check_cvv(verts[i].pos) && transform_check_cvv(verts[i + 1].pos) && transform_check_cvv(verts[i + 2].pos)) {
+    if (
+      transform_check_cvv(verts[i].pos) &&
+      transform_check_cvv(verts[i + 1].pos) &&
+      transform_check_cvv(verts[i + 2].pos) &&
+      backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)
+    ) {
       transform_homogenize(verts[i], width, height);
       transform_homogenize(verts[i + 1], width, height);
       transform_homogenize(verts[i + 2], width, height);
@@ -53,13 +58,13 @@ const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
 // };
 
 // 背面剔除
-const backCull = (a: Vertex_t, b: Vertex_t, c: Vertex_t) => {
-  const ax = b.pos.x - a.pos.x;
-  const ay = b.pos.y - a.pos.y;
-  const bx = c.pos.x - b.pos.x;
-  const by = c.pos.y - b.pos.y;
+const backCull = (a: Vector4, b: Vector4, c: Vector4) => {
+  const ax = b.x - a.x;
+  const ay = b.y - a.y;
+  const bx = c.x - b.x;
+  const by = c.y - b.y;
   const z = ax * by - ay * bx;
-  return z > 0;
+  return z < 0;
 };
 
 export { primitivePipeline };

@@ -16,7 +16,7 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   gl_position.copy(position);
   vNormal.applyMatrix4(modelView as Matrix4);
   vWorldPosition.applyMatrix4(modelView as Matrix4);
-  gl_position.applyMatrix4(projection as Matrix4);
+  gl_position.applyMatrix4(modelView).applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数
   varyings['vNormal'] = vNormal;
   varyings['vWorldPosition'] = vWorldPosition;
@@ -25,11 +25,11 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
 const fragShader = (frag: Vertex_t, _uniforms: uniformsProp, gl_FragColor: Vector4) => {
   const { primaryData } = frag;
   let { vNormal } = primaryData;
-  vNormal.normalize();
-  const diffuse = Math.max(vNormal.dot(new Vector4(0, -1, 0, 1)), 0);
-  gl_FragColor.x = 0.1;
-  gl_FragColor.y = 0.1;
-  gl_FragColor.z = 0.1;
+  const normal = new Vector4().copy(vNormal).normalize()
+  const diffuse = Math.max(normal.dot(new Vector4(0, 1, 0, 1)), 0);
+  gl_FragColor.x = diffuse;
+  gl_FragColor.y = diffuse;
+  gl_FragColor.z = diffuse;
   gl_FragColor.multiplyScalar(255);
 };
 export { vertShader, fragShader };
