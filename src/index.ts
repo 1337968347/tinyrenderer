@@ -1,7 +1,9 @@
 import * as Scene from './engine/scene';
 import { ShaderProgram } from './engine/pipeline';
-import { getPosAndNormal } from './engine/utils';
+import { parseObj } from './engine/utils';
 import { bunnyStr } from './assets/bunny-obj';
+import { getPosAndNormal } from './engine/utils';
+import { CottageString } from './assets/cottage-obj';
 import { vertShader, fragShader } from './shader';
 import { Clock } from './engine/utils';
 import CameraController from './engine/control/cameraController';
@@ -23,6 +25,7 @@ let rabertTransform: Scene.Transform;
 let robertRoteteY = 0;
 
 const prepareScene = () => {
+  // const data = parseObj(CottageString);
   const attributes = getPosAndNormal(bunnyStr);
   camera = new Scene.Camera();
   inputHandler = new InputHandler(canvasEl);
@@ -36,9 +39,9 @@ const prepareScene = () => {
   camera.position.set(0, 0, 3);
 };
 const tick = (_time: number) => {
-  console.log(_time)
+  console.log(_time);
   robertRoteteY += _time;
-  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, -5, 5), new Matrix4().makeRotationY(robertRoteteY));
+  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(1, -1, 1), new Matrix4().makeRotationY(robertRoteteY));
   cameraController.tick();
   graph.tick();
 };

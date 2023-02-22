@@ -4,15 +4,14 @@ import { Vector4 } from 'three';
 const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => {
   const cropVerts: Vertex_t[] = [];
   for (let i = 0; i < verts.length; i += 3) {
-    if (
-      transform_check_cvv(verts[i].pos) &&
-      transform_check_cvv(verts[i + 1].pos) &&
-      transform_check_cvv(verts[i + 2].pos) &&
-      backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)
-    ) {
+    if (transform_check_cvv(verts[i].pos) && transform_check_cvv(verts[i + 1].pos) && transform_check_cvv(verts[i + 2].pos)) {
       transform_homogenize(verts[i], width, height);
       transform_homogenize(verts[i + 1], width, height);
       transform_homogenize(verts[i + 2], width, height);
+
+      if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) {
+        continue;
+      }
       cropVerts.push(verts[i]);
       cropVerts.push(verts[i + 1]);
       cropVerts.push(verts[i + 2]);
@@ -64,7 +63,7 @@ const backCull = (a: Vector4, b: Vector4, c: Vector4) => {
   const bx = c.x - b.x;
   const by = c.y - b.y;
   const z = ax * by - ay * bx;
-  return z < 0;
+  return z > 0;
 };
 
 export { primitivePipeline };
