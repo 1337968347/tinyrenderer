@@ -22,11 +22,12 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   varyings['vWorldPosition'] = vWorldPosition;
 };
 
-const fragShader = (frag: Vertex_t, _uniforms: uniformsProp, gl_FragColor: Vector4) => {
+const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector4) => {
   const { primaryData } = frag;
-  let { vNormal } = primaryData;
-  const normal = new Vector4().copy(vNormal).normalize()
-  const diffuse = Math.max(normal.dot(new Vector4(0, 1, 0, 1)), 0);
+  let { vNormal, vWorldPosition } = primaryData;
+  const normal = new Vector4().copy(vNormal).normalize();
+  const lightVec = new Vector4().subVectors(uniforms.sunPosition as Vector4, vWorldPosition).normalize();
+  const diffuse = Math.max(normal.dot(lightVec), 0);
   gl_FragColor.x = diffuse;
   gl_FragColor.y = diffuse;
   gl_FragColor.z = diffuse;
