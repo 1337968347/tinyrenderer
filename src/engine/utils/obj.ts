@@ -1,7 +1,7 @@
 import { Vector4 } from 'three';
 
 // 解析Obj格式
-export const parseObj = text => {
+export const parseObj = (text: string) => {
   // because indices are base 1 let's just fill in the 0th data
   const objPositions = [[0, 0, 0]];
   const objTexcoords = [[0, 0]];
@@ -11,7 +11,7 @@ export const parseObj = text => {
   const objVertexData = [objPositions, objTexcoords, objNormals];
 
   // same order as `f` indices
-  let webglVertexData = [
+  let webglVertexData: number[][] = [
     [], // positions
     [], // texcoords
     [], // normals
@@ -70,6 +70,7 @@ export const parseObj = text => {
     }
     handler(parts, unparsedArgs);
   }
+
   return {
     position: webglVertexData[0],
     texcoord: webglVertexData[1],
@@ -85,6 +86,7 @@ const cross = (a, b) => {
     z: a.x * b.y - a.y * b.x,
   };
 };
+
 const normalize = a => {
   const len = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
   return { x: a.x / len, y: a.y / len, z: a.z / len };
