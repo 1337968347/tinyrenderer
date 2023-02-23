@@ -61,12 +61,12 @@ const prepareScene = resource => {
   camera.append(baseMaterial);
   graph.append(camera);
 
-  camera.position.set(0, 0, 18);
+  camera.position.set(0, 0, 25);
 };
 const tick = (_time: number) => {
   console.log(_time);
   robertRoteteY += _time;
-  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, -5, 5), new Matrix4().makeRotationY(robertRoteteY));
+  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(robertRoteteY));
   cameraController.tick();
   graph.tick();
 };

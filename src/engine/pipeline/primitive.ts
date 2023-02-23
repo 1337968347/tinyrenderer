@@ -63,7 +63,7 @@ const backCull = (a: Vector4, b: Vector4, c: Vector4) => {
   const bx = c.x - b.x;
   const by = c.y - b.y;
   const z = ax * by - ay * bx;
-  return z > 0;
+  return z < 0;
 };
 
 export { primitivePipeline };

@@ -1,5 +1,4 @@
 import { Vector4 } from 'three';
-import { clamp } from '../utils';
 class Texture2D {
   width: number;
   height: number;
@@ -11,8 +10,6 @@ class Texture2D {
   }
 
   getUV(u: number, v: number) {
-    u = clamp(0.0, u, 1.0);
-    v = clamp(0.0, v, 1.0);
     const { width, height, data } = this;
     const x = (width * u) | 0;
     const y = (height * v) | 0;
