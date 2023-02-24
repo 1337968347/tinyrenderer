@@ -219,6 +219,9 @@ const rasterizationPipeline = (props: rasterizationPipelineProps) => {
   const { verts, zBuffer, imageData, fragShader, uniforms } = props;
   // 每个图元
   for (let i = 0; i < verts.length; i += 3) {
+    // vertex_rhw_init(verts[i]);
+    // vertex_rhw_init(verts[i + 1]);
+    // vertex_rhw_init(verts[i + 2]);
     const traps: Trapezoid_t[] = trapezoid_Init_Triangle(verts[i], verts[i + 1], verts[i + 2]);
     for (let j = 0; j < traps.length; j++) {
       render_trap(imageData, zBuffer, traps[j], uniforms, fragShader);

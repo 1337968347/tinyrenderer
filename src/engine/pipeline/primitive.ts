@@ -36,7 +36,7 @@ const transform_check_cvv = (v: Vector4) => {
 const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
   const rhw = 1.0 / v.pos.w;
   v.pos.x = (v.pos.x * rhw + 1.0) * width * 0.5;
-  v.pos.y = (1.0 - v.pos.y * rhw) * height * 0.5;
+  v.pos.y = (v.pos.y * rhw + 1.0) * height * 0.5;
   v.pos.z = v.pos.z * rhw;
   v.rhw = v.pos.w;
   v.pos.w = 1.0;
@@ -63,7 +63,7 @@ const backCull = (a: Vector4, b: Vector4, c: Vector4) => {
   const bx = c.x - b.x;
   const by = c.y - b.y;
   const z = ax * by - ay * bx;
-  return z < 0;
+  return z > 0;
 };
 
 export { primitivePipeline };

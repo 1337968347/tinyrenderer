@@ -153,9 +153,9 @@ export class Camera extends SceneNode {
   // y Rotate
   y: number = 0.0;
   // 透视投影 近截面
-  near: number = 0.01;
+  near: number = 1;
   // 透视投影 远截面
-  far: number = 100;
+  far: number = 1000;
   // 透视投影 视野范围
   fov: number = 50;
   // 相机视野左右跟上下的比例
