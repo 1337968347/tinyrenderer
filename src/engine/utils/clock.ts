@@ -3,6 +3,9 @@ class Clock {
   nowT: number;
   timeId: NodeJS.Timeout | null = null;
   onTick: TickFunc;
+  flushNum: number = 0;
+  fps: number = 0;
+  seconds = (new Date().getTime() / 1000) | 0;
 
   constructor() {}
 
@@ -32,6 +35,14 @@ class Clock {
   }
 
   tick() {
+    const nowSeconds = (this.nowT / 1000) | 0;
+    if (nowSeconds !== this.seconds) {
+      this.fps = this.flushNum;
+      this.flushNum = 0;
+      this.seconds = nowSeconds;
+    } else {
+      this.flushNum++;
+    }
     const t = this.nowT;
     this.nowT = new Date().getTime();
     this.onTick && this.onTick((this.nowT - t) / 1000);

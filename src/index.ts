@@ -18,6 +18,7 @@ let clock = new Clock();
 let cameraController: CameraController;
 let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
+const fpsEl = document.querySelector('#fps');
 const loader = new Loader('./assets/');
 canvasEl.width = 512;
 canvasEl.height = 512;
@@ -51,7 +52,8 @@ const prepareScene = () => {
   camera.position.set(0, 0, 25);
 };
 const tick = (_time: number) => {
-  console.log(_time);
+  fpsEl.innerHTML = clock.fps + '';
+  // console.log(_time);
   objectRoteteY += _time;
   objectTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
