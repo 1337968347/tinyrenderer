@@ -3,7 +3,13 @@ class Texture2D {
   width: number;
   height: number;
   data: Uint8ClampedArray;
-  constructor(imageData: ImageData) {
+  constructor(imgEl: HTMLImageElement) {
+    const canvas = document.createElement('canvas');
+    canvas.width = imgEl.width;
+    canvas.height = imgEl.height;
+    const gl = canvas.getContext('2d');
+    gl.drawImage(imgEl, 0, 0);
+    const imageData = gl.getImageData(0, 0, canvas.width, canvas.height);
     this.width = imageData.width;
     this.height = imageData.height;
     this.data = imageData.data;

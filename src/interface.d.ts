@@ -27,7 +27,7 @@ declare global {
     attributes: attributeProps;
     vertShader: VertShader;
     fragShader: FragShader;
-    frameBufferData: ImageData;
+    frameBufferData?: ImageData;
   };
 
   type GL_FragColor = Vector4;

@@ -8,40 +8,27 @@ import { Clock } from './engine/utils';
 import CameraController from './engine/control/cameraController';
 import InputHandler from './engine/control/input';
 import { Texture2D } from './engine/geometry/texture';
+import Loader from './engine/utils/loader';
 
 let globalUniform: uniformsProp = {
   sunPosition: new Vector4(5, 5, 0, 1.0),
 };
 
-let frameBufferData = null;
 let clock = new Clock();
 let cameraController: CameraController;
 let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
+const loader = new Loader('./assets/');
 canvasEl.width = 512;
 canvasEl.height = 512;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
-let rabertTransform: Scene.Transform;
-let robertRoteteY = 0;
+let objectTransform: Scene.Transform;
+let objectRoteteY = 0;
+loader.load(['texture.png']);
 
-const loaderAssets = () => {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.src = './assets/texture.png';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const gl = canvas.getContext('2d');
-      gl.drawImage(img, 0, 0);
-      resolve(gl.getImageData(0, 0, canvas.width, canvas.height));
-    };
-  });
-};
-
-const prepareScene = resource => {
-  globalUniform['texture'] = new Texture2D(resource.textureData);
+const prepareScene = () => {
+  globalUniform['texture'] = new Texture2D(loader.resources['texture.png']);
   const { position, normal, texcoord } = parseObj(african_head);
 
   const positions: Vector4[] = [];
@@ -55,9 +42,9 @@ const prepareScene = resource => {
   const attributes = { position: positions, texcoord: texcoords, normal: normals };
 
   cameraController = new CameraController(inputHandler, camera);
-  const rabbitPragram = new ShaderProgram({ attributes, frameBufferData, vertShader, fragShader });
-  rabertTransform = new Scene.Transform([new Scene.Mesh()]);
-  const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [rabertTransform]);
+  const rabbitPragram = new ShaderProgram({ attributes, vertShader, fragShader });
+  objectTransform = new Scene.Transform([new Scene.Mesh()]);
+  const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [objectTransform]);
   camera.append(baseMaterial);
   graph.append(camera);
 
@@ -65,18 +52,16 @@ const prepareScene = resource => {
 };
 const tick = (_time: number) => {
   console.log(_time);
-  robertRoteteY += _time;
-  rabertTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(robertRoteteY));
+  objectRoteteY += _time;
+  objectTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
   graph.tick();
 };
 
-loaderAssets().then(imageData => {
-  const resource = {
-    textureData: imageData,
-  };
-  prepareScene(resource);
+loader.onRendy = () => {
+  prepareScene();
   clock.setOnTick(tick);
   clock.start();
   // clock.stop();
-});
+  window['clock'] = clock;
+};

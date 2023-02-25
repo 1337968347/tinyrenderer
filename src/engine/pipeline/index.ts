@@ -11,10 +11,13 @@ class ShaderProgram {
   attributes: attributeProps;
   vertShader: VertShader;
   fragShader: FragShader;
-  constructor({ attributes, vertShader, fragShader }: ProgramProp) {
+  constructor({ attributes, vertShader, fragShader, frameBufferData }: ProgramProp) {
     this.attributes = attributes;
     this.vertShader = vertShader;
     this.fragShader = fragShader;
+    if (frameBufferData) {
+      this.bindFrameBuffer(frameBufferData);
+    }
   }
 
   bindFrameBuffer(frameBufferData: ImageData) {
