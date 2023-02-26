@@ -53,7 +53,6 @@ const prepareScene = () => {
 };
 const tick = (_time: number) => {
   fpsEl.innerHTML = clock.fps + '';
-  // console.log(_time);
   objectRoteteY += _time;
   objectTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();

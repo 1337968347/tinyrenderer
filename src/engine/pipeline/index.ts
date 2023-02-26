@@ -4,39 +4,27 @@ import { vertPipeline } from './vert';
 import { primitivePipeline } from './primitive';
 // 光栅化
 import { rasterizationPipeline } from './rasterization';
+import * as Scene from '../scene';
 
 class ShaderProgram {
-  zBuffer: Float32Array;
-  frameBufferData: ImageData;
   attributes: attributeProps;
   vertShader: VertShader;
   fragShader: FragShader;
-  constructor({ attributes, vertShader, fragShader, frameBufferData }: ProgramProp) {
+  constructor({ attributes, vertShader, fragShader }: ProgramProp) {
     this.attributes = attributes;
     this.vertShader = vertShader;
     this.fragShader = fragShader;
-    if (frameBufferData) {
-      this.bindFrameBuffer(frameBufferData);
-    }
   }
 
-  bindFrameBuffer(frameBufferData: ImageData) {
-    const { width, height } = frameBufferData;
-    this.zBuffer = new Float32Array(width * height);
-
-    this.frameBufferData = frameBufferData;
-  }
-
-  draw(uniforms: uniformsProp) {
-    const { attributes, vertShader, zBuffer, fragShader } = this;
+  draw(uniforms: uniformsProp, graph: Scene.Graph) {
+    const { zBuffer, frameBufferData } = graph;
+    const { attributes, vertShader, fragShader } = this;
     // 顶点着色器
     let verts: Vertex_t[] = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装
-    verts = primitivePipeline(verts, this.frameBufferData.width, this.frameBufferData.height);
-    zBuffer.fill(-Infinity);
-    this.frameBufferData.data.fill(0);
+    verts = primitivePipeline(verts, graph.viewPort.width, graph.viewPort.height);
     // 光栅化（图元数据 => 片元数据）
-    rasterizationPipeline({ verts, zBuffer, imageData: this.frameBufferData, fragShader, uniforms });
+    rasterizationPipeline({ verts, zBuffer, imageData: frameBufferData, fragShader, uniforms });
   }
 }
 

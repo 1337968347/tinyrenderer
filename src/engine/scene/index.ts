@@ -36,6 +36,8 @@ export class Graph {
   root: SceneNode = new SceneNode([]);
   canvasEl: HTMLCanvasElement = null;
   ctx: CanvasRenderingContext2D;
+  zBuffer: Float32Array;
+  frameBufferData: ImageData;
   viewPort: { width: number; height: number } = { width: 0, height: 0 };
 
   constructor(props: GraphProp = { width: 512, height: 512 }) {
@@ -53,6 +55,7 @@ export class Graph {
       this.viewPort.width = width || 512;
       this.viewPort.height = height || 512;
     }
+    this.bindFrameBuffer(this.ctx.getImageData(0, 0, this.canvasEl.width, this.canvasEl.height));
   }
 
   append(node: SceneNode) {
@@ -60,6 +63,11 @@ export class Graph {
   }
 
   tick() {
+    this.draw();
+  }
+
+  draw() {
+    this.clear();
     this.root.visit(this);
   }
 
@@ -81,6 +89,17 @@ export class Graph {
 
   getProgram() {
     return this.programs[this.programs.length - 1];
+  }
+
+  bindFrameBuffer(frameBufferData: ImageData) {
+    const { width, height } = frameBufferData;
+    this.zBuffer = new Float32Array(width * height);
+    this.frameBufferData = frameBufferData;
+  }
+
+  clear() {
+    this.zBuffer.fill(-Infinity);
+    this.frameBufferData.data.fill(0);
   }
 }
 
@@ -130,20 +149,9 @@ export class Mesh extends SceneNode {
   }
 
   enter(graph: Graph): void {
-    const frameBufferData = new ImageData(graph.viewPort.width, graph.viewPort.height);
-
-    const shaderProgram = graph.getProgram();
-    shaderProgram.bindFrameBuffer(frameBufferData);
-
     const program = graph.getProgram();
-    program.draw(graph.uniform);
-    graph.ctx.putImageData(frameBufferData, 0, 0);
-  }
-
-  exit(graph: Graph): void {
-    const shaderProgram = graph.getProgram();
-    const frameBufferData = shaderProgram.frameBufferData;
-    graph.ctx.putImageData(frameBufferData, 0, 0);
+    program.draw(graph.uniform, graph);
+    graph.ctx.putImageData(graph.frameBufferData, 0, 0);
   }
 }
 
