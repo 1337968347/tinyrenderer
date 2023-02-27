@@ -7,18 +7,16 @@ import { rasterizationPipeline } from './rasterization';
 import * as Scene from '../scene';
 
 class ShaderProgram {
-  attributes: attributeProps;
   vertShader: VertShader;
   fragShader: FragShader;
-  constructor({ attributes, vertShader, fragShader }: ProgramProp) {
-    this.attributes = attributes;
+  constructor({ vertShader, fragShader }: ProgramProp) {
     this.vertShader = vertShader;
     this.fragShader = fragShader;
   }
 
-  draw(uniforms: uniformsProp, graph: Scene.Graph) {
+  draw(attributes: AttributeProps, uniforms: uniformsProp, graph: Scene.Graph) {
     const { zBuffer, frameBufferData } = graph;
-    const { attributes, vertShader, fragShader } = this;
+    const { vertShader, fragShader } = this;
     // 顶点着色器
     let verts: Vertex_t[] = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装

@@ -43,8 +43,8 @@ const prepareScene = () => {
   const attributes = { position: positions, texcoord: texcoords, normal: normals };
 
   cameraController = new CameraController(inputHandler, camera);
-  const rabbitPragram = new ShaderProgram({ attributes, vertShader, fragShader });
-  objectTransform = new Scene.Transform([new Scene.Mesh()]);
+  const rabbitPragram = new ShaderProgram({ vertShader, fragShader });
+  objectTransform = new Scene.Transform([new Scene.Mesh(attributes)]);
   const baseMaterial = new Scene.Material(rabbitPragram, new Scene.Uniforms(globalUniform), [objectTransform]);
   camera.append(baseMaterial);
   graph.append(camera);

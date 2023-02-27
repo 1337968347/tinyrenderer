@@ -144,13 +144,15 @@ export class Uniforms extends SceneNode {
 
 export class Mesh extends SceneNode {
   children: SceneNode[];
-  constructor(children: SceneNode[] = []) {
+  attributes: AttributeProps;
+  constructor(attributes: AttributeProps, children: SceneNode[] = []) {
     super(children);
+    this.attributes = attributes;
   }
 
   enter(graph: Graph): void {
     const program = graph.getProgram();
-    program.draw(graph.uniform, graph);
+    program.draw(this.attributes, graph.uniform, graph);
     graph.ctx.putImageData(graph.frameBufferData, 0, 0);
   }
 }

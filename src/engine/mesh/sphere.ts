@@ -15,10 +15,10 @@ export const d3_sphere = (r = 1, n = 200, m = 100) => {
       const px = Math.sin(phi) * Math.cos(theta) * r;
       const pz = Math.sin(phi) * Math.sin(theta) * r;
       // colors.push(Math.random(), Math.random(), Math.random(), 1)
-      texCoords.push(1 - u, v);
+      texCoords.push(1 - u, v, 0.0);
       vertices.push(px, py, pz);
       norms.push(px, py, pz);
     }
   }
-  return { vertices};
+  return { vertices, norms, texCoords };
 };

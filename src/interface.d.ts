@@ -4,16 +4,16 @@ import { Texture2D } from './engine/geometry/texture';
 declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
-  type attributeProps = { position?: Vector4[]; [key: string]: Vector4[] };
+  type AttributeProps = { position?: Vector4[]; [key: string]: Vector4[] };
   type uniformsProp = { modelView?: Matrix4; [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
 
-  type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: attributeProps, gl_position: Vector4) => void;
+  type VertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: AttributeProps, gl_position: Vector4) => void;
 
   type FragShader = (vary: Vertex_t, uniforms: uniformsProp, gl_FragColor: GL_FragColor) => void;
 
-  type VertPipeline = (props: { attributes: attributeProps; uniforms: uniformsProp; vertShader: VertShader }) => Vertex_t[];
+  type VertPipeline = (props: { attributes: AttributeProps; uniforms: uniformsProp; vertShader: VertShader }) => Vertex_t[];
 
   type rasterizationPipelineProps = {
     verts: Vertex_t[];
@@ -24,7 +24,6 @@ declare global {
   };
 
   type ProgramProp = {
-    attributes: attributeProps;
     vertShader: VertShader;
     fragShader: FragShader;
   };
