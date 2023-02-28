@@ -46,7 +46,7 @@ const pointerCoord = (ev: any): { x: number; y: number } => {
 export default class InputHandler {
   keys: { [k: string]: boolean } = {};
   offset: { x: number; y: number } = { x: 0, y: 0 };
-  mouse: { down: boolean; x: number; y: number } = { down: false, x: 0, y: 0 };
+  mouse: { down: boolean; x: number; y: number; prevX: number; prevY: number } = { down: false, x: 0, y: 0, prevX: 0, prevY: 0 };
   onClick = undefined;
   onKeyUp = undefined;
   onKeyDown = undefined;
@@ -59,6 +59,8 @@ export default class InputHandler {
     this.element = element;
     this.bind(element);
     this.reset();
+    this.width = element.width;
+    this.height = element.height;
   }
 
   bind(element: HTMLCanvasElement) {
@@ -98,13 +100,15 @@ export default class InputHandler {
     document.onmouseup = this.mouseUp;
   }
 
-  // 获取鼠标点击点距离元素中心的距离
   getOffsetFromElementCenter() {
     if (!this.element) {
       return { x: 0, y: 0 };
     }
     if (this.mouse.down) {
-      return { x: this.mouse.x - this.element.width * 0.5, y: this.mouse.y - this.element.height * 0.5 };
+      const res = { x: (this.mouse.x - this.mouse.prevX) / this.width , y: (this.mouse.y - this.mouse.prevY) / this.height  };
+      this.mouse.prevX = this.mouse.x;
+      this.mouse.prevY = this.mouse.y;
+      return res;
     }
     return { x: 0, y: 0 };
   }
@@ -128,8 +132,8 @@ export default class InputHandler {
 
   mouseDown = (pageX: number, pageY: number) => {
     this.mouse.down = true;
-    this.mouse.x = clamp(pageX - this.offset.x, 0, this.element.width);
-    this.mouse.y = clamp(pageY - this.offset.y, 0, this.element.height);
+    this.mouse.prevX = this.mouse.x = clamp(pageX - this.offset.x, 0, this.element.width);
+    this.mouse.prevY = this.mouse.y = clamp(pageY - this.offset.y, 0, this.element.height);
   };
 
   mouseUp = () => {
@@ -167,7 +171,7 @@ export default class InputHandler {
     for (let i in KEYNAME) {
       this.keys[KEYNAME[i]] = false;
     }
-    this.mouse = { down: false, x: 0, y: 0 };
+    this.mouse = { down: false, x: 0, y: 0, prevX: 0, prevY: 0 };
   };
 
   getKeyName = (key: number) => {
