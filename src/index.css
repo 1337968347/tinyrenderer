@@ -3,6 +3,7 @@ body {
 }
 canvas {
   border: 1px solid #cccccc;
+  transform: scaleY(-1);
 }
 div {
   position: absolute;

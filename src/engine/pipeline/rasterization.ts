@@ -92,8 +92,8 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
     const trap: Trapezoid_t = {
       top: p1.pos.y,
       bottom: p3.pos.y,
-      left: { v1: p1, v2: p2, v: newVertex() },
-      right: { v1: p1, v2: p3, v: newVertex() },
+      left: { v1: p1, v2: p3, v: newVertex() },
+      right: { v1: p2, v2: p3, v: newVertex() },
     };
 
     return [trap];

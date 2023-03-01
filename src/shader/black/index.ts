@@ -1,5 +1,5 @@
 import { Matrix4, Vector4 } from 'three';
-import { Texture2D } from '../engine/geometry/texture';
+import { Texture2D } from '../../engine/geometry/texture';
 
 /**
  * 顶点变换 着色器
