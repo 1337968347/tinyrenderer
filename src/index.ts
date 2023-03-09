@@ -50,8 +50,8 @@ const prepareScene = () => {
   blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
   const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms(globalUniform), [blackTransform]);
   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms(globalUniform), [new Scene.Mesh(screen_quad())]);
-  // camera.append(blackMaterial);
-  camera.append(wallMaterial);
+  camera.append(blackMaterial);
+  // camera.append(wallMaterial);
   graph.append(camera);
 
   camera.position.set(0, 0, 25);
@@ -59,7 +59,7 @@ const prepareScene = () => {
 const tick = (_time: number) => {
   fpsEl.innerHTML = clock.fps + '';
   objectRoteteY += _time;
-  blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, 5, 5), new Matrix4().makeRotationY(objectRoteteY));
+  blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, -5, 5), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
   graph.tick();
 };

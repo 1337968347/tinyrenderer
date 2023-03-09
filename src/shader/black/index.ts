@@ -30,7 +30,7 @@ const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector
   const texture = (uniforms.texture as Texture2D).getUV(primaryData.uv.x, primaryData.uv.y);
   const normal = new Vector4().copy(vNormal).normalize();
   const lightVec = new Vector4().subVectors(uniforms.sunPosition as Vector4, vWorldPosition).normalize();
-  const diffuse = Math.max(normal.dot(lightVec), 0) + 0.5;
+  const diffuse = (Math.max(normal.dot(lightVec), 0) + 0.8) * 2;
   texture.multiplyScalar(diffuse);
   gl_FragColor.x = texture.x | 0;
   gl_FragColor.y = texture.y | 0;

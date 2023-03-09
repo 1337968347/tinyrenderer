@@ -47,12 +47,14 @@ declare global {
     primaryData: { [key: string]: Vector4 };
   };
 
+  // 边
   type Edge_t = {
     v?: Vertex_t;
     v1: Vertex_t;
     v2: Vertex_t;
   };
 
+  // 光栅化三角形
   type Trapezoid_t = {
     top: number;
     bottom: number;
@@ -66,6 +68,24 @@ declare global {
     x: number;
     y: number;
     w: number;
+  };
+
+  // phong 模型中的简单光照
+  type PhongLight = {
+    pos: Vector3 | Vector4;
+    color: Vector3 | Vector4;
+  };
+
+  type AmbientLight = {
+    // 反射的环境光强度
+    ambientStrength: number;
+    // 反射的漫反射光强度 Lambert
+    DiffuseStrength: number;
+    // 反射的镜面反射光强度
+    SpecularStrength: number;
+    // 值越大，表面越平滑
+    shininess: number
+
   };
 
   type TickFunc = (time: number) => void;
