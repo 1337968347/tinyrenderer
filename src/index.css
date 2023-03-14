@@ -2,7 +2,8 @@ body {
   margin: 0;
 }
 canvas {
-  border: 1px solid #cccccc;
+  border: 1px solid #414141;
+  opacity: 0.7;
 }
 div {
   position: absolute;

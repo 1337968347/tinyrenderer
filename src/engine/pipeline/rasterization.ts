@@ -1,7 +1,7 @@
 import { Vector4 } from 'three';
 
 const newVertex = () => {
-  const vert: Vertex_t = { pos: new Vector4(), rhw: 0, primaryData: {} };
+  const vert: Vertex_t = { pos: new Vector4(), rhw: 0, varying: {} };
   return vert;
 };
 
@@ -21,9 +21,9 @@ const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
 // 顶点插值
 const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
   vector_Interp(z.pos, x1.pos, x2.pos, t);
-  for (let key in x1.primaryData) {
-    z.primaryData[key] = new Vector4();
-    vector_Interp(z.primaryData[key], x1.primaryData[key], x2.primaryData[key], t);
+  for (let key in x1.varying) {
+    z.varying[key] = new Vector4();
+    vector_Interp(z.varying[key], x1.varying[key], x2.varying[key], t);
   }
   z.rhw = interp(x1.rhw, x2.rhw, t);
 };
@@ -36,12 +36,12 @@ const vertex_division = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, w: number) => 
   z.pos.w = (x2.pos.w - x1.pos.w) * inv;
   z.rhw = (x2.rhw - x1.rhw) * inv;
 
-  for (let key in x1.primaryData) {
-    z.primaryData[key] = new Vector4();
-    z.primaryData[key].x = (x2.primaryData[key].x - x1.primaryData[key].x) * inv;
-    z.primaryData[key].y = (x2.primaryData[key].y - x1.primaryData[key].y) * inv;
-    z.primaryData[key].z = (x2.primaryData[key].z - x1.primaryData[key].z) * inv;
-    z.primaryData[key].w = (x2.primaryData[key].w - x1.primaryData[key].w) * inv;
+  for (let key in x1.varying) {
+    z.varying[key] = new Vector4();
+    z.varying[key].x = (x2.varying[key].x - x1.varying[key].x) * inv;
+    z.varying[key].y = (x2.varying[key].y - x1.varying[key].y) * inv;
+    z.varying[key].z = (x2.varying[key].z - x1.varying[key].z) * inv;
+    z.varying[key].w = (x2.varying[key].w - x1.varying[key].w) * inv;
   }
 };
 
@@ -52,11 +52,11 @@ const vertex_add = (y: Vertex_t, x: Vertex_t) => {
   y.pos.w += x.pos.w;
   y.rhw += x.rhw;
 
-  for (let key in y.primaryData) {
-    y.primaryData[key].x += x.primaryData[key].x;
-    y.primaryData[key].y += x.primaryData[key].y;
-    y.primaryData[key].z += x.primaryData[key].z;
-    y.primaryData[key].w += x.primaryData[key].w;
+  for (let key in y.varying) {
+    y.varying[key].x += x.varying[key].x;
+    y.varying[key].y += x.varying[key].y;
+    y.varying[key].z += x.varying[key].z;
+    y.varying[key].w += x.varying[key].w;
   }
 };
 
@@ -195,7 +195,7 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
     step: {
       pos: new Vector4(),
       rhw: 0,
-      primaryData: {},
+      varying: {},
     },
   };
   const top = (trap.top + 0.5) | 0;

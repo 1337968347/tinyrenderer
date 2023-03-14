@@ -5,7 +5,7 @@ declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
   type AttributeProps = { position?: Vector4[]; [key: string]: Vector4[] };
-  type uniformsProp = { modelView?: Matrix4; [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 };
+  type uniformsProp = { modelView?: Matrix4; [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 | any };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
 
@@ -44,7 +44,7 @@ declare global {
   type Vertex_t = {
     pos: Vector4;
     rhw: number;
-    primaryData: { [key: string]: Vector4 };
+    varying: { [key: string]: Vector4 };
   };
 
   // 边
@@ -71,21 +71,27 @@ declare global {
   };
 
   // phong 模型中的简单光照
-  type PhongLight = {
-    pos: Vector3 | Vector4;
-    color: Vector3 | Vector4;
+  // 点光源
+  type PhongLightPoint = {
+    pos: Vector3;
+    color: Vector3;
   };
 
-  type AmbientLight = {
+  type PhongObjectMaterial = {
+    lightMaterial: PhongLightMaterial;
+    color: Vector3;
+  };
+
+  // phong 模型中环境光强度，漫反射强度，镜面反射强度
+  type PhongLightMaterial = {
     // 反射的环境光强度
     ambientStrength: number;
     // 反射的漫反射光强度 Lambert
-    DiffuseStrength: number;
+    diffuseStrength: number;
     // 反射的镜面反射光强度
-    SpecularStrength: number;
+    specularStrength: number;
     // 值越大，表面越平滑
-    shininess: number
-
+    shininess: number;
   };
 
   type TickFunc = (time: number) => void;

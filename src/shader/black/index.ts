@@ -1,5 +1,6 @@
-import { Matrix4, Vector4 } from 'three';
+import { Matrix4, Vector3, Vector4 } from 'three';
 import { Texture2D } from '../../engine/geometry/texture';
+import { calcPhongLight } from '../base/light';
 
 /**
  * 顶点变换 着色器
@@ -25,16 +26,18 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
 };
 
 const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector4) => {
-  const { primaryData } = frag;
-  let { vNormal, vWorldPosition } = primaryData;
-  const texture = (uniforms.texture as Texture2D).getUV(primaryData.uv.x, primaryData.uv.y);
-  const normal = new Vector4().copy(vNormal).normalize();
-  const lightVec = new Vector4().subVectors(uniforms.sunPosition as Vector4, vWorldPosition).normalize();
-  const diffuse = (Math.max(normal.dot(lightVec), 0) + 0.8) * 2;
-  texture.multiplyScalar(diffuse);
-  gl_FragColor.x = texture.x | 0;
-  gl_FragColor.y = texture.y | 0;
-  gl_FragColor.z = texture.z | 0;
+  const { light, eye, blackLightMaterial } = uniforms;
+  const { varying } = frag;
+  let { vNormal, vWorldPosition, uv } = varying;
+  const blackTexture: Texture2D = uniforms.texture as Texture2D;
+  const texture = blackTexture.getUV(uv.x, uv.y);
+  const normal = new Vector3(vNormal.x, vNormal.y, vNormal.z).normalize();
+  const kl = calcPhongLight(blackLightMaterial, light, new Vector3(vWorldPosition.x, vWorldPosition.y, vWorldPosition.z), normal, eye);
+  const color = texture.multiply(new Vector4().copy(light.color).multiplyScalar(kl));
+
+  gl_FragColor.x = color.x | 0;
+  gl_FragColor.y = color.y | 0;
+  gl_FragColor.z = color.z | 0;
   gl_FragColor.w = 255;
 };
 export { vertShader, fragShader };
