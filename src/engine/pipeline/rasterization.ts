@@ -152,6 +152,9 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
  * @returns 校正后的插值系数
  */
 const intensityS2W = (vt: number, p1: Vector4, p2: Vector4) => {
+  if (p1.z === p2.z) {
+    return vt;
+  }
   return (vt * p1.z) / (vt * p1.z + (1 - vt) * p2.z);
 };
 

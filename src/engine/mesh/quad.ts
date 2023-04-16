@@ -11,5 +11,16 @@ export const screen_quad = () => {
     new Vector4(1, -1, 0, 1.0),
     new Vector4(1, 1, 0, 1.0),
   ];
-  return { position };
+
+  const texcoord = [
+    new Vector4(0, 0, 0, 1.0),
+    new Vector4(0, 1, 0, 1.0),
+    new Vector4(1, 1, 0, 1.0),
+
+    new Vector4(0, 0, 0, 1.0),
+    new Vector4(1, 1, 0, 1.0),
+    new Vector4(1, 0, 0, 1.0),
+  ]
+
+  return { position, texcoord };
 };

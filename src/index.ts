@@ -13,7 +13,7 @@ import { Texture2D } from './engine/geometry/texture';
 import Loader from './engine/utils/loader';
 
 const light: PhongLightPoint = {
-  pos: new Vector3(3, 0, 0),
+  pos: new Vector3(3, 0, 3),
   color: new Vector3(0.7, 0.7, 0.7),
 };
 
@@ -27,8 +27,8 @@ let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
 const fpsEl = document.querySelector('#fps');
 const loader = new Loader('./assets/');
-canvasEl.width = 1024;
-canvasEl.height = 1024;
+canvasEl.width = 512;
+canvasEl.height = 512;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
 let blackTransform: Scene.Transform;
@@ -38,7 +38,7 @@ const blackLightMaterial: PhongLightMaterial = {
   // 反射的漫反射光强度 Lambert
   diffuseStrength: 3,
   // 反射的镜面反射光强度
-  specularStrength: 10,
+  specularStrength: 2,
   // 值越大，表面越平滑
   shininess: 10,
 };
@@ -62,11 +62,11 @@ const prepareScene = () => {
   cameraController = new CameraController(inputHandler, camera);
   const blackProgram = new ShaderProgram(BlackShader);
   const wallProgram = new ShaderProgram(WallShader);
-  blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
-  const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
-  // const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms(globalUniform), [new Scene.Mesh(screen_quad())]);
+  // blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
+  // const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
+  const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms(globalUniform), [new Scene.Mesh(screen_quad())]);
 
-  const gUniform = new Scene.Uniforms(globalUniform, [blackMaterial]);
+  const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
   camera.append(gUniform);
   // camera.append(wallMaterial);
   graph.append(camera);
@@ -76,7 +76,7 @@ const prepareScene = () => {
 const tick = (_time: number) => {
   fpsEl.innerHTML = clock.fps + '';
   objectRoteteY += _time * 0.2;
-  blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(5, -5, 5), new Matrix4().makeRotationY(objectRoteteY));
+  // blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(4, -4, 4), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
   graph.tick();
 };
