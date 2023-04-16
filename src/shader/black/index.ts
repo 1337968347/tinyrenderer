@@ -1,4 +1,4 @@
-import { Matrix4, Vector3, Vector4 } from 'three';
+import { Matrix4, Matrix3, Vector3, Vector4 } from 'three';
 import { Texture2D } from '../../engine/geometry/texture';
 import { calcPhongLight } from '../base/light';
 
@@ -13,10 +13,11 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   // 世界坐标
   const vWorldPosition = new Vector4().copy(position);
   // 法线
-  const vNormal = new Vector4().copy(normal);
+  const vNormal = new Vector3(normal.x, normal.y, normal.z);
   // 标准投影空间的坐标
   gl_position.copy(position);
-  vNormal.applyMatrix4(modelView as Matrix4);
+  const normalMatrix = new Matrix3().setFromMatrix4(modelView).invert().transpose();
+  vNormal.applyNormalMatrix (normalMatrix);
   vWorldPosition.applyMatrix4(modelView as Matrix4);
   gl_position.applyMatrix4(modelView).applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数

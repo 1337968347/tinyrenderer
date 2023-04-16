@@ -1,4 +1,4 @@
-import { Matrix4, Vector3, Vector4 } from 'three';
+import { Matrix4, Vector2, Vector3, Vector4 } from 'three';
 import { Trangle } from '../src/engine/geometry';
 import { Texture2D } from './engine/geometry/texture';
 declare global {
@@ -44,6 +44,7 @@ declare global {
   type Vertex_t = {
     pos: Vector4;
     rhw: number;
+    // 基于重心坐标插值的各种数据
     varying: { [key: string]: Vector4 };
   };
 

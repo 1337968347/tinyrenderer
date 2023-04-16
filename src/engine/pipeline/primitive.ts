@@ -8,10 +8,10 @@ const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => 
       transform_homogenize(verts[i], width, height);
       transform_homogenize(verts[i + 1], width, height);
       transform_homogenize(verts[i + 2], width, height);
-
-      if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) {
-        continue;
-      }
+      
+      // if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) {
+      //   continue;
+      // }
       cropVerts.push(verts[i]);
       cropVerts.push(verts[i + 1]);
       cropVerts.push(verts[i + 2]);
@@ -38,23 +38,9 @@ const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
   v.pos.x = (v.pos.x * rhw + 1.0) * width * 0.5;
   v.pos.y = (1.0 - v.pos.y * rhw) * height * 0.5;
   v.pos.z = v.pos.z * rhw;
-  v.rhw = v.pos.w;
+  v.rhw = rhw;
   v.pos.w = 1.0;
 };
-
-// // 视锥体剔除
-// const frustumCull = (a: Vertex_t, b: Vertex_t, c: Vertex_t, bbox: BBox): boolean => {
-//   if (!bbox.inside(a.pos)) {
-//     return false;
-//   }
-//   if (!bbox.inside(b.pos)) {
-//     return false;
-//   }
-//   if (!bbox.inside(c.pos)) {
-//     return false;
-//   }
-//   return true;
-// };
 
 // 背面剔除
 const backCull = (a: Vector4, b: Vector4, c: Vector4) => {

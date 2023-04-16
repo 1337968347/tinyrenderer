@@ -33,9 +33,9 @@ export const calcPhongLight = (lightMaterial: PhongLightMaterial, light: PhongLi
   // 常数衰减系数
   const kc = 1;
   // 一次项衰减系数
-  const kl = 0.0014;
+  const kl = 0.1;
   // 二次项 衰减系数
-  const kq = 0.000007;
+  const kq = 0.01;
   // 距离衰减系数
   const fatt = 1.0 / (kc + kl * d + kq * d * d);
   // 法向量 点乘 入射光向量
@@ -46,7 +46,7 @@ export const calcPhongLight = (lightMaterial: PhongLightMaterial, light: PhongLi
   // 半角向量
   const H = new Vector3().addVectors(L, V).normalize();
   // 镜面光 镜面反射光 = 镜面反射强度
-  const specular = specularStrength * fatt * Math.pow(N.dot(H), shininess | 0);
+  const specular = fatt * Math.pow(Math.max(0, N.dot(H)), shininess) * specularStrength;;
 
   // 镜面反射
   return ambient + diffuse + specular;

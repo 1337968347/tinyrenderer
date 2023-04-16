@@ -62,6 +62,10 @@ const vertex_add = (y: Vertex_t, x: Vertex_t) => {
 
 /**
  * 将大三角形划分成 0 - 2 个平底 | 平顶 三角形
+ * @param p1
+ * @param p2
+ * @param p3
+ * @returns
  */
 const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
   let p: Vertex_t;
@@ -138,12 +142,37 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
   return [topTrap, bottomTrap];
 };
 
-// 根据Y坐标算出左右两条边纵坐标等于Y的顶点
+/**
+ * 根据两个点的坐标，以及在屏幕空间上的插值系数，得到透视前的插值。
+ * 透视插值矫正
+ * https://zhuanlan.zhihu.com/p/144331875
+ * @param vt
+ * @param p1
+ * @param p2
+ * @returns 校正后的插值系数
+ */
+const intensityS2W = (vt: number, p1: Vector4, p2: Vector4) => {
+  return (vt * p1.z) / (vt * p1.z + (1 - vt) * p2.z);
+};
+
+/**
+ * 根据Y坐标算出左右两条边纵坐标等于Y的顶点
+ * 三角形上下插值
+ * @param trap
+ * @param y
+ */
 const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
+  // 左边长
   const s1 = trap.left.v2.pos.y - trap.left.v1.pos.y;
+  // 右边长
   const s2 = trap.right.v2.pos.y - trap.right.v1.pos.y;
-  const t1 = (y - trap.left.v1.pos.y) / s1;
-  const t2 = (y - trap.right.v1.pos.y) / s2;
+  // 屏幕空间三角形左边的插值系数
+  let t1 = (y - trap.left.v1.pos.y) / s1;
+  t1 = intensityS2W(t1, trap.left.v1.pos, trap.left.v2.pos);
+
+  // 屏幕空间三角形右边的插值系数
+  let t2 = (y - trap.right.v1.pos.y) / s2;
+  t2 = intensityS2W(t2, trap.right.v1.pos, trap.right.v2.pos);
 
   vertex_Interp(trap.left.v, trap.left.v1, trap.left.v2, t1);
   vertex_Interp(trap.right.v, trap.right.v1, trap.right.v2, t2);
@@ -161,6 +190,14 @@ const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: nu
   vertex_division(scanline.step, trap.left.v, trap.right.v, width);
 };
 
+/**
+ * 根据扫描线的数据，调用着色器，绘制在画布上
+ * @param imageData
+ * @param zBuffer
+ * @param scanline
+ * @param uniforms
+ * @param fragShader
+ */
 const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
   const { width, data } = imageData;
   let { x, w } = scanline;
@@ -186,6 +223,14 @@ const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanl
   }
 };
 
+/**
+ * 绘制划分后的三角形
+ * @param imageData
+ * @param zBuffer
+ * @param trap
+ * @param uniforms
+ * @param fragShader
+ */
 const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoid_t, uniforms: uniformsProp, fragShader: FragShader) => {
   // 扫描线
   const scanline: Scanline_t = {
@@ -219,9 +264,6 @@ const rasterizationPipeline = (props: rasterizationPipelineProps) => {
   const { verts, zBuffer, imageData, fragShader, uniforms } = props;
   // 每个图元
   for (let i = 0; i < verts.length; i += 3) {
-    // vertex_rhw_init(verts[i]);
-    // vertex_rhw_init(verts[i + 1]);
-    // vertex_rhw_init(verts[i + 2]);
     const traps: Trapezoid_t[] = trapezoid_Init_Triangle(verts[i], verts[i + 1], verts[i + 2]);
     for (let j = 0; j < traps.length; j++) {
       render_trap(imageData, zBuffer, traps[j], uniforms, fragShader);

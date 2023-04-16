@@ -14,7 +14,7 @@ import Loader from './engine/utils/loader';
 
 const light: PhongLightPoint = {
   pos: new Vector3(3, 0, 0),
-  color: new Vector3(1, 0.7, 0.7),
+  color: new Vector3(0.7, 0.7, 0.7),
 };
 
 let globalUniform: uniformsProp = {
@@ -27,20 +27,20 @@ let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
 const fpsEl = document.querySelector('#fps');
 const loader = new Loader('./assets/');
-canvasEl.width = 512;
-canvasEl.height = 512;
+canvasEl.width = 1024;
+canvasEl.height = 1024;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
 let blackTransform: Scene.Transform;
 const blackLightMaterial: PhongLightMaterial = {
   // 反射的环境光强度
-  ambientStrength: 0.3,
+  ambientStrength: 0.5,
   // 反射的漫反射光强度 Lambert
-  diffuseStrength: 4.5,
+  diffuseStrength: 3,
   // 反射的镜面反射光强度
-  specularStrength: 0.3,
+  specularStrength: 10,
   // 值越大，表面越平滑
-  shininess: 60,
+  shininess: 10,
 };
 
 let objectRoteteY = 0;
@@ -86,5 +86,6 @@ loader.onRendy = () => {
   clock.setOnTick(tick);
   clock.start();
   // clock.stop();
+  window['camera'] = camera
   window['clock'] = clock;
 };
