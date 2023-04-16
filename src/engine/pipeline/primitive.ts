@@ -5,13 +5,18 @@ const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => 
   const cropVerts: Vertex_t[] = [];
   for (let i = 0; i < verts.length; i += 3) {
     if (transform_check_cvv(verts[i].pos) && transform_check_cvv(verts[i + 1].pos) && transform_check_cvv(verts[i + 2].pos)) {
-      transform_homogenize(verts[i], width, height);
-      transform_homogenize(verts[i + 1], width, height);
-      transform_homogenize(verts[i + 2], width, height);
-      
+      perspectiveDivide(verts[i]);
+      perspectiveDivide(verts[i+1]);
+      perspectiveDivide(verts[i+2]);
+
       // if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) {
       //   continue;
       // }
+
+      transform_homogenize(verts[i], width, height);
+      transform_homogenize(verts[i + 1], width, height);
+      transform_homogenize(verts[i + 2], width, height);
+   
       cropVerts.push(verts[i]);
       cropVerts.push(verts[i + 1]);
       cropVerts.push(verts[i + 2]);
@@ -32,14 +37,19 @@ const transform_check_cvv = (v: Vector4) => {
   return check === 0;
 };
 
-// 归一化，得到屏幕坐标
-const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
+const perspectiveDivide = (v: Vertex_t)=>{
   const rhw = 1.0 / v.pos.w;
-  v.pos.x = (v.pos.x * rhw + 1.0) * width * 0.5;
-  v.pos.y = (1.0 - v.pos.y * rhw) * height * 0.5;
+  v.pos.x = v.pos.x * rhw;
+  v.pos.y = v.pos.y * rhw;
   v.pos.z = v.pos.z * rhw;
   v.rhw = rhw;
   v.pos.w = 1.0;
+}
+
+// 归一化，得到屏幕坐标
+const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
+  v.pos.x = (v.pos.x + 1.0) * width * 0.5;
+  v.pos.y = (1.0 - v.pos.y ) * height * 0.5;
 };
 
 // 背面剔除
