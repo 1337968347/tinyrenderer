@@ -15,11 +15,10 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   // 法线
   const vNormal = new Vector3(normal.x, normal.y, normal.z);
   // 标准投影空间的坐标
-  gl_position.copy(position);
   const normalMatrix = new Matrix3().setFromMatrix4(modelView).invert().transpose();
-  vNormal.applyNormalMatrix (normalMatrix);
+  vNormal.applyMatrix3(normalMatrix).normalize();
   vWorldPosition.applyMatrix4(modelView as Matrix4);
-  gl_position.applyMatrix4(modelView).applyMatrix4(projection as Matrix4);
+  gl_position.copy(vWorldPosition).applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数
   varyings['vNormal'] = vNormal;
   varyings['vWorldPosition'] = vWorldPosition;

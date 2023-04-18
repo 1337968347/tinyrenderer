@@ -1,8 +1,11 @@
+import { Vector4 } from "three";
+
+// TODO 修正
 export const d3_sphere = (r = 1, n = 200, m = 100) => {
   // [0, 2pi]
-  const vertices = [];
+  const position = [];
   const norms = [];
-  const texCoords = [];
+  const texcoord = [];
   for (let y = 0; y <= m; y++) {
     for (let x = 0; x <= n; x++) {
       const u = x / n;
@@ -15,10 +18,10 @@ export const d3_sphere = (r = 1, n = 200, m = 100) => {
       const px = Math.sin(phi) * Math.cos(theta) * r;
       const pz = Math.sin(phi) * Math.sin(theta) * r;
       // colors.push(Math.random(), Math.random(), Math.random(), 1)
-      texCoords.push(1 - u, v, 0.0);
-      vertices.push(px, py, pz);
-      norms.push(px, py, pz);
+      position.push(new Vector4(px, py, pz, 1.0));
+      texcoord.push(new Vector4(1 - u, v, 0.0, 1.0));
+      norms.push(new Vector4(px, py, pz, 1.0));
     }
   }
-  return { vertices, norms, texCoords };
+  return { position, norms, texcoord };
 };

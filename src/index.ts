@@ -6,14 +6,14 @@ import { parseObj } from './engine/utils';
 import * as BlackShader from './shader/black';
 import * as WallShader from './shader/wall';
 import { Clock } from './engine/utils';
-import { screen_quad } from './engine/mesh';
+import { screen_quad, d3_sphere } from './engine/mesh';
 import CameraController from './engine/control/cameraController';
 import InputHandler from './engine/control/input';
 import { Texture2D } from './engine/geometry/texture';
 import Loader from './engine/utils/loader';
 
 const light: PhongLightPoint = {
-  pos: new Vector3(3, 0, 3),
+  pos: new Vector3(3.0, 0.0, 4.0),
   color: new Vector3(0.7, 0.7, 0.7),
 };
 
@@ -31,23 +31,25 @@ canvasEl.width = 512;
 canvasEl.height = 512;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
+let wallTransform: Scene.Transform;
 let blackTransform: Scene.Transform;
 const blackLightMaterial: PhongLightMaterial = {
   // 反射的环境光强度
-  ambientStrength: 0.5,
+  ambientStrength: 0.2,
   // 反射的漫反射光强度 Lambert
-  diffuseStrength: 3,
+  diffuseStrength: 0.5,
   // 反射的镜面反射光强度
-  specularStrength: 2,
+  specularStrength: 5,
   // 值越大，表面越平滑
-  shininess: 10,
+  shininess: 50,
 };
 
 let objectRoteteY = 0;
-loader.load(['texture.png']);
+loader.load(['texture.png', 'wall_normal_map.png']);
 
 const prepareScene = () => {
   globalUniform['texture'] = new Texture2D(loader.resources['texture.png']);
+  globalUniform['normal'] = new Texture2D(loader.resources['wall_normal_map.png']);
   const { position, normal, texcoord } = parseObj(african_head);
 
   const positions: Vector4[] = [];
@@ -62,20 +64,22 @@ const prepareScene = () => {
   cameraController = new CameraController(inputHandler, camera);
   const blackProgram = new ShaderProgram(BlackShader);
   const wallProgram = new ShaderProgram(WallShader);
-  // blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
-  // const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
-  const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms(globalUniform), [new Scene.Mesh(screen_quad())]);
+  blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
+  wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad(), [], 1)])
+  wallTransform.wordMatrix = new Matrix4()
+  const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
+  const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ blackLightMaterial }), [wallTransform]);
 
   const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
   camera.append(gUniform);
-  // camera.append(wallMaterial);
   graph.append(camera);
 
-  camera.position.set(0, 0, 30);
+  camera.position.set(0, 0, 3);
 };
 const tick = (_time: number) => {
   fpsEl.innerHTML = clock.fps + '';
   objectRoteteY += _time * 0.2;
+  console.log(camera.position)
   // blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(4, -4, 4), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
   graph.tick();

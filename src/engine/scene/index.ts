@@ -19,8 +19,8 @@ class SceneNode {
     this.children.push(node);
   }
 
-  enter(_graph: Graph) {}
-  exit(_graph: Graph) {}
+  enter(_graph: Graph) { }
+  exit(_graph: Graph) { }
 }
 
 type GraphProp = {
@@ -55,6 +55,7 @@ export class Graph {
       this.viewPort.width = width || 512;
       this.viewPort.height = height || 512;
     }
+    this.zBuffer = new Float32Array(this.viewPort.width * this.viewPort.height);
     this.bindFrameBuffer(this.ctx.getImageData(0, 0, this.canvasEl.width, this.canvasEl.height));
   }
 
@@ -92,8 +93,9 @@ export class Graph {
   }
 
   bindFrameBuffer(frameBufferData: ImageData) {
-    const { width, height } = frameBufferData;
-    this.zBuffer = new Float32Array(width * height);
+    if (this.viewPort.width !== frameBufferData.width || this.viewPort.height !== frameBufferData.height) {
+      throw new Error("frameBufferData 跟当前场景图的宽高不一致");
+    }
     this.frameBufferData = frameBufferData;
   }
 
@@ -145,12 +147,17 @@ export class Uniforms extends SceneNode {
 export class Mesh extends SceneNode {
   children: SceneNode[];
   attributes: AttributeProps;
-  constructor(attributes: AttributeProps, children: SceneNode[] = []) {
+  debuggerE: number
+  constructor(attributes: AttributeProps, children: SceneNode[] = [], debuggerE?) {
     super(children);
+    this.debuggerE = debuggerE
     this.attributes = attributes;
   }
 
   enter(graph: Graph): void {
+    // if (this.debuggerE) {
+    //   debugger
+    // }
     const program = graph.getProgram();
     program.draw(this.attributes, graph.uniform, graph);
     graph.ctx.putImageData(graph.frameBufferData, 0, 0);
