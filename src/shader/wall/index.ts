@@ -1,4 +1,4 @@
-import { Vector4, Vector3, Matrix3, Matrix4 } from 'three';
+import { Vector4, Vector3, Matrix4 } from 'three';
 import { Texture2D } from '../../engine/geometry/texture';
 import { calcPhongLight } from '../base/light';
 

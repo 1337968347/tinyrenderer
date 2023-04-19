@@ -27,8 +27,8 @@ let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
 const fpsEl = document.querySelector('#fps');
 const loader = new Loader('./assets/');
-canvasEl.width = 512;
-canvasEl.height = 512;
+canvasEl.width = 1024;
+canvasEl.height = 1024;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
 let wallTransform: Scene.Transform;
@@ -81,17 +81,27 @@ const prepareScene = () => {
   const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial }), [wallTransform]);
 
-  const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial, blackMaterial]);
+  const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
   camera.append(gUniform);
   graph.append(camera);
 
   camera.position.set(0, 0, 10);
 };
+
+let cacheStr = ''
+
 const tick = (_time: number) => {
+
   fpsEl.innerHTML = clock.fps + '';
   objectRoteteY += _time * 0.2;
   blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(4, -4, 4), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
+  const tempCacheStr = `${camera.position.x}-${camera.position.y}-${camera.position.z}-${camera.x}-${camera.y}`
+  if (cacheStr === tempCacheStr) {
+    return
+  }
+  cacheStr = tempCacheStr
+
   graph.tick();
 };
 
