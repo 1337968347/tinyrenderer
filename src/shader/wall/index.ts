@@ -23,7 +23,7 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
 
 const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector4) => {
   const { varying } = frag;
-  const { light, eye, blackLightMaterial } = uniforms;
+  const { light, eye, wallLightMaterial } = uniforms;
   let { uv, vWorldPosition } = varying;
   const wallTexture: Texture2D = uniforms.texture as Texture2D;
   const wallNormalTexture: Texture2D = uniforms.normal as Texture2D;
@@ -31,7 +31,7 @@ const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector
   const normalVec4 = wallNormalTexture.getUV(uv.x, uv.y)
   const normal = new Vector3(normalVec4.x, normalVec4.y, normalVec4.z).normalize();
 
-  const kl = calcPhongLight(blackLightMaterial, light, new Vector3(vWorldPosition.x, vWorldPosition.y, vWorldPosition.z), new Vector3(normal.x, normal.y, normal.z), eye);
+  const kl = calcPhongLight(wallLightMaterial, light, new Vector3(vWorldPosition.x, vWorldPosition.y, vWorldPosition.z), new Vector3(normal.x, normal.y, normal.z), eye);
   const color = texture.multiply(new Vector4().copy(light.color).multiplyScalar(kl));
 
   gl_FragColor.x = color.x | 0;
