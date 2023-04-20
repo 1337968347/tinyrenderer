@@ -31,38 +31,12 @@ canvasEl.width = 1024;
 canvasEl.height = 1024;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler: InputHandler = new InputHandler(canvasEl);
-let wallTransform: Scene.Transform;
-let blackTransform: Scene.Transform;
-const wallLightMaterial: PhongLightMaterial = {
-  // 反射的环境光强度
-  ambientStrength: 0.2,
-  // 反射的漫反射光强度 Lambert
-  diffuseStrength: 0.5,
-  // 反射的镜面反射光强度
-  specularStrength: 5,
-  // 值越大，表面越平滑
-  shininess: 50,
-};
 
-const blackLightMaterial: PhongLightMaterial = {
-  // 反射的环境光强度
-  ambientStrength: 0.5,
-  // 反射的漫反射光强度 Lambert
-  diffuseStrength: 0.5,
-  // 反射的镜面反射光强度
-  specularStrength: 1,
-  // 值越大，表面越平滑
-  shininess: 50,
-}
 
-let objectRoteteY = 0;
 loader.load(['texture.png', 'wall_normal_map.png']);
 
-const prepareScene = () => {
-  globalUniform['texture'] = new Texture2D(loader.resources['texture.png']);
-  globalUniform['normal'] = new Texture2D(loader.resources['wall_normal_map.png']);
+const makeBlack = () => {
   const { position, normal, texcoord } = parseObj(african_head);
-
   const positions: Vector4[] = [];
   const texcoords: Vector4[] = [];
   const normals: Vector4[] = [];
@@ -71,35 +45,64 @@ const prepareScene = () => {
     texcoords.push(new Vector4(texcoord[i], texcoord[i + 1], 0, 1.0));
     normals.push(new Vector4(normal[i], normal[i + 1], normal[i + 2], 1));
   }
-
-  cameraController = new CameraController(inputHandler, camera);
+  const blackLightMaterial: PhongLightMaterial = {
+    // 反射的环境光强度
+    ambientStrength: 0.5,
+    // 反射的漫反射光强度 Lambert
+    diffuseStrength: 0.5,
+    // 反射的镜面反射光强度
+    specularStrength: 1,
+    // 值越大，表面越平滑
+    shininess: 50,
+  }
+  let blackTransform: Scene.Transform;
   const blackProgram = new ShaderProgram(BlackShader);
-  const wallProgram = new ShaderProgram(WallShader);
   blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
+  const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
+  return blackMaterial;
+}
+
+const makeWall = () => {
+  const wallLightMaterial: PhongLightMaterial = {
+    // 反射的环境光强度
+    ambientStrength: 0.2,
+    // 反射的漫反射光强度 Lambert
+    diffuseStrength: 0.5,
+    // 反射的镜面反射光强度
+    specularStrength: 5,
+    // 值越大，表面越平滑
+    shininess: 50,
+  };
+  const wallProgram = new ShaderProgram(WallShader);
+  let wallTransform: Scene.Transform;
   wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad(), [], 1)])
   wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
-  const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial }), [wallTransform]);
+  return wallMaterial;
+}
 
-  const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
+
+const prepareScene = () => {
+  globalUniform['texture'] = new Texture2D(loader.resources['texture.png']);
+  globalUniform['normal'] = new Texture2D(loader.resources['wall_normal_map.png']);
+  cameraController = new CameraController(inputHandler, camera);
+
+  // const wallMaterial = makeWall()
+
+  const gUniform = new Scene.Uniforms(globalUniform, []);
   camera.append(gUniform);
   graph.append(camera);
 
   camera.position.set(0, 0, 10);
 };
 
+
 let cacheStr = ''
-
 const tick = (_time: number) => {
-
   fpsEl.innerHTML = clock.fps + '';
-  objectRoteteY += _time * 0.2;
-  blackTransform.wordMatrix = new Matrix4().multiplyMatrices(new Matrix4().makeScale(4, -4, 4), new Matrix4().makeRotationY(objectRoteteY));
   cameraController.tick();
   const tempCacheStr = `${camera.position.x}-${camera.position.y}-${camera.position.z}-${camera.x}-${camera.y}`
-  if (cacheStr === tempCacheStr) {
-    return
-  }
+  if (cacheStr === tempCacheStr) return
   cacheStr = tempCacheStr
 
   graph.tick();
