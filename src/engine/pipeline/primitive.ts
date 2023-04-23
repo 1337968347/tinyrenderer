@@ -1,26 +1,47 @@
 import { Vector4 } from 'three';
-// import { BBox } from '../geometry';
+import { State } from "../"
+
+// 视锥体裁剪
+const check_CVV = (verts: Vertex_t[], i: number) => {
+  if (!State.state['use-cvvCull']) { return true }
+  if (transform_check_cvv(verts[i].pos) && transform_check_cvv(verts[i + 1].pos) && transform_check_cvv(verts[i + 2].pos)) { return true }
+  return false
+}
+
+// 背面剔除
+const check_BackCull = (verts: Vertex_t[], i: number) => {
+  if (!State.state['use-backCull']) { return true }
+  if (backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) { return true }
+  return true
+}
 
 const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => {
   const cropVerts: Vertex_t[] = [];
   for (let i = 0; i < verts.length; i += 3) {
-    if (transform_check_cvv(verts[i].pos) && transform_check_cvv(verts[i + 1].pos) && transform_check_cvv(verts[i + 2].pos)) {
-      perspectiveDivide(verts[i]);
-      perspectiveDivide(verts[i+1]);
-      perspectiveDivide(verts[i+2]);
 
-      // if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) {
-      //   continue;
-      // }
-
-      transform_homogenize(verts[i], width, height);
-      transform_homogenize(verts[i + 1], width, height);
-      transform_homogenize(verts[i + 2], width, height);
-   
-      cropVerts.push(verts[i]);
-      cropVerts.push(verts[i + 1]);
-      cropVerts.push(verts[i + 2]);
+    // 视锥体裁剪
+    if (!check_CVV(verts, i)) {
+      continue;
     }
+
+    // 透视除法
+    perspectiveDivide(verts[i]);
+    perspectiveDivide(verts[i + 1]);
+    perspectiveDivide(verts[i + 2]);
+
+    // 背面剔除
+    if (!check_BackCull(verts, i)) {
+      continue
+    }
+
+    // 屏幕空间 
+    transform_homogenize(verts[i], width, height);
+    transform_homogenize(verts[i + 1], width, height);
+    transform_homogenize(verts[i + 2], width, height);
+
+    cropVerts.push(verts[i]);
+    cropVerts.push(verts[i + 1]);
+    cropVerts.push(verts[i + 2]);
   }
   return cropVerts;
 };
@@ -37,7 +58,7 @@ const transform_check_cvv = (v: Vector4) => {
   return check === 0;
 };
 
-const perspectiveDivide = (v: Vertex_t)=>{
+const perspectiveDivide = (v: Vertex_t) => {
   const rhw = 1.0 / v.pos.w;
   v.pos.x = v.pos.x * rhw;
   v.pos.y = v.pos.y * rhw;
@@ -49,7 +70,7 @@ const perspectiveDivide = (v: Vertex_t)=>{
 // 归一化，得到屏幕坐标
 const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
   v.pos.x = (v.pos.x + 1.0) * width * 0.5;
-  v.pos.y = (1.0 - v.pos.y ) * height * 0.5;
+  v.pos.y = (1.0 - v.pos.y) * height * 0.5;
 };
 
 // 背面剔除

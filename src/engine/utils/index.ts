@@ -2,4 +2,8 @@ export { parseObj, getPosAndNormal } from './obj';
 
 export { Clock } from './clock';
 
-export * from './helper';
+import * as Helper from './helper';
+
+import * as Loader from "./loader"
+
+export { Helper, Loader }

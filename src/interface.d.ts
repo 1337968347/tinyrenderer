@@ -4,8 +4,8 @@ import { Texture2D } from './engine/geometry/texture';
 declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
-  type AttributeProps = { position?: Vector4[]; [key: string]: Vector4[] };
-  type uniformsProp = { modelView?: Matrix4; [key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 | any };
+  type AttributeProps = { position?: Vector4[];[key: string]: Vector4[] };
+  type uniformsProp = { modelView?: Matrix4;[key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 | any };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
 
@@ -96,4 +96,11 @@ declare global {
   };
 
   type TickFunc = (time: number) => void;
+
+  type RenderState = {
+    // 使用背面剔除
+    'use-backCull': boolean;
+    // 使用CVV裁剪
+    'use-cvvCull': boolean;
+  }
 }

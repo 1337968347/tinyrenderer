@@ -4,7 +4,7 @@ import { vertPipeline } from './vert';
 import { primitivePipeline } from './primitive';
 // 光栅化
 import { rasterizationPipeline } from './rasterization';
-import * as Scene from '../scene';
+import { Scene } from '../';
 
 class ShaderProgram {
   vertShader: VertShader;

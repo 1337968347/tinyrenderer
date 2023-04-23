@@ -1,5 +1,5 @@
 import { Matrix3, Matrix4, Vector3, Vector4 } from 'three';
-import { ShaderProgram } from '../pipeline';
+import { State, ShaderProgram } from "../index"
 
 class SceneNode {
   children: SceneNode[] = [];
@@ -28,6 +28,7 @@ type GraphProp = {
   width?: number;
   height?: number;
 };
+
 // 开放场景图
 export class Graph {
   children: SceneNode[];
@@ -147,17 +148,12 @@ export class Uniforms extends SceneNode {
 export class Mesh extends SceneNode {
   children: SceneNode[];
   attributes: AttributeProps;
-  debuggerE: number
-  constructor(attributes: AttributeProps, children: SceneNode[] = [], debuggerE?) {
+  constructor(attributes: AttributeProps, children: SceneNode[] = []) {
     super(children);
-    this.debuggerE = debuggerE
     this.attributes = attributes;
   }
 
   enter(graph: Graph): void {
-    // if (this.debuggerE) {
-    //   debugger
-    // }
     const program = graph.getProgram();
     program.draw(this.attributes, graph.uniform, graph);
     graph.ctx.putImageData(graph.frameBufferData, 0, 0);
@@ -226,9 +222,6 @@ export class Camera extends SceneNode {
 
 export class Transform extends SceneNode {
   wordMatrix = new Matrix4().identity();
-  constructor(children: SceneNode[]) {
-    super(children);
-  }
 
   enter(graph: Graph): void {
     if (graph.uniform.modelView) {
@@ -241,5 +234,22 @@ export class Transform extends SceneNode {
 
   exit(graph: Graph) {
     graph.popUniforms();
+  }
+}
+
+
+export class SkyBox extends SceneNode {
+  lastCvvState: boolean;
+  lastBackState: boolean;
+  enter(_graph: Graph): void {
+    this.lastCvvState = State.state['use-cvvCull'];
+    this.lastBackState = State.state['use-backCull'];
+    State.disable('use-cvvCull')
+    State.enable('use-backCull')
+  }
+
+  exit(_graph: Graph): void {
+    State.state['use-cvvCull'] = this.lastCvvState;
+    State.state['use-backCull'] = this.lastBackState;
   }
 }
