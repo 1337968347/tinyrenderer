@@ -183,8 +183,10 @@ export class Camera extends SceneNode {
     graph.pushUniforms();
 
     const projectMat4 = this.perspective();
-    const worldViewMat4 = this.getWorldView();
-    const mvp = new Matrix4().multiplyMatrices(projectMat4, worldViewMat4);
+    const lookAtMat4 = this.getWorldView();
+    const mvp = new Matrix4().multiplyMatrices(projectMat4, lookAtMat4);
+    // 方向矩阵
+    graph.uniform.view = lookAtMat4;
     graph.uniform.projection = mvp;
     graph.uniform.eye = this.position;
   }
@@ -224,10 +226,10 @@ export class Transform extends SceneNode {
   wordMatrix = new Matrix4().identity();
 
   enter(graph: Graph): void {
-    if (graph.uniform.modelView) {
-      graph.uniform.modelView = graph.uniform.modelView.multiply(this.wordMatrix);
+    if (graph.uniform.model) {
+      graph.uniform.model = graph.uniform.model.multiply(this.wordMatrix);
     } else {
-      graph.uniform.modelView = new Matrix4().copy(this.wordMatrix);
+      graph.uniform.model = new Matrix4().copy(this.wordMatrix);
     }
     graph.pushUniforms();
   }
@@ -241,15 +243,25 @@ export class Transform extends SceneNode {
 export class SkyBox extends SceneNode {
   lastCvvState: boolean;
   lastBackState: boolean;
-  enter(_graph: Graph): void {
+  uniforms: Uniforms;
+
+  constructor(children: SceneNode[] = [], uniforms: Uniforms) {
+    super(children);
+    this.uniforms = uniforms;
+  }
+
+
+  enter(graph: Graph): void {
     this.lastCvvState = State.state['use-cvvCull'];
     this.lastBackState = State.state['use-backCull'];
     State.disable('use-cvvCull')
     State.enable('use-backCull')
+    this.uniforms.enter(graph);
   }
 
-  exit(_graph: Graph): void {
+  exit(graph: Graph): void {
     State.state['use-cvvCull'] = this.lastCvvState;
     State.state['use-backCull'] = this.lastBackState;
+    this.uniforms.exit(graph)
   }
 }

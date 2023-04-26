@@ -5,7 +5,7 @@ declare global {
   type attributeProp = { [key: string]: Vector4 };
   // 图元
   type AttributeProps = { position?: Vector4[];[key: string]: Vector4[] };
-  type uniformsProp = { modelView?: Matrix4;[key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 | any };
+  type uniformsProp = { model?: Matrix4;[key: string]: Vector4 | number | Matrix4 | Texture2D | Vector3 | any };
   // 图元数据
   type PrimitiveData = { [key: string]: Trangle[] };
 

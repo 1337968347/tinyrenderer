@@ -2,7 +2,7 @@
 const createRenderStore = () => {
     const state: RenderState = {
         // 使用背面剔除
-        'use-backCull': true,
+        'use-backCull': false,
         // 使用CVV裁剪
         'use-cvvCull': true
     }

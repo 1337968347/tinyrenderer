@@ -21,9 +21,10 @@ const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
 // 顶点插值
 const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
   vector_Interp(z.pos, x1.pos, x2.pos, t);
+  const t1 = intensityS2W(t, x1.pos, x2.pos);
   for (let key in x1.varying) {
     z.varying[key] = new Vector4();
-    vector_Interp(z.varying[key], x1.varying[key], x2.varying[key], t);
+    vector_Interp(z.varying[key], x1.varying[key], x2.varying[key], t1);
   }
   z.rhw = interp(x1.rhw, x2.rhw, t);
 };
@@ -152,6 +153,7 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
  * @returns 校正后的插值系数
  */
 const intensityS2W = (vt: number, p1: Vector4, p2: Vector4) => {
+  // return vt;
   if (p1.z === p2.z) {
     return vt;
   }
@@ -171,11 +173,9 @@ const trapezoid_edge_interp = (trap: Trapezoid_t, y: number) => {
   const s2 = trap.right.v2.pos.y - trap.right.v1.pos.y;
   // 屏幕空间三角形左边的插值系数
   let t1 = (y - trap.left.v1.pos.y) / s1;
-  t1 = intensityS2W(t1, trap.left.v1.pos, trap.left.v2.pos);
 
   // 屏幕空间三角形右边的插值系数
   let t2 = (y - trap.right.v1.pos.y) / s2;
-  t2 = intensityS2W(t2, trap.right.v1.pos, trap.right.v2.pos);
 
   vertex_Interp(trap.left.v, trap.left.v1, trap.left.v2, t1);
   vertex_Interp(trap.right.v, trap.right.v1, trap.right.v2, t2);

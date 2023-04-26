@@ -9,10 +9,10 @@ import { calcPhongLight } from '../base/light';
  */
 const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: Object, gl_position: Vector4) => {
   const { position, texcoord } = attribute;
-  const { modelView, projection } = uniforms;
+  const { model, projection } = uniforms;
   // 世界坐标
   const vWorldPosition = new Vector4().copy(position);
-  vWorldPosition.applyMatrix4(modelView as Matrix4);
+  vWorldPosition.applyMatrix4(model as Matrix4);
 
   // 标准投影空间的坐标
   gl_position.copy(vWorldPosition).applyMatrix4(projection as Matrix4);

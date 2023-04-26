@@ -11,7 +11,7 @@ const check_CVV = (verts: Vertex_t[], i: number) => {
 // 背面剔除
 const check_BackCull = (verts: Vertex_t[], i: number) => {
   if (!State.state['use-backCull']) { return true }
-  if (backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) { return true }
+  if (!backCull(verts[i].pos, verts[i + 1].pos, verts[i + 2].pos)) { return false }
   return true
 }
 

@@ -61,9 +61,10 @@ loader.load(['texture.png', 'wall_normal_map.png', ...skyboxTex]);
 //   let blackTransform: Scene.Transform;
 //   const blackProgram = new ShaderProgram(BlackShader);
 //   blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
-//   const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial }), [blackTransform]);
+//   const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial, texture: new Texture2D(loader.resources['texture.png']) }), [blackTransform]);
 //   return blackMaterial;
 // }
+
 
 // const makeWall = () => {
 //   const wallLightMaterial: PhongLightMaterial = {
@@ -80,24 +81,29 @@ loader.load(['texture.png', 'wall_normal_map.png', ...skyboxTex]);
 //   let wallTransform: Scene.Transform;
 //   wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
 //   wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
-//   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial }), [wallTransform]);
+//   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial, normal: new Texture2D(loader.resources['wall_normal_map.png']) }), [wallTransform]);
 //   return wallMaterial;
 // }
 
 const makeSkyBox = () => {
   const skyBoxProgram = new ShaderProgram(SkyBoxShader);
-  const skyBoxTransform = new Scene.Transform([new Scene.SkyBox([new Scene.Mesh(Cute())])]);
+  const skyboxTexture = {
+    posX: new Texture2D(loader.resources['./skybox/right.jpg']),
+    negX: new Texture2D(loader.resources['./skybox/left.jpg']),
+    posY: new Texture2D(loader.resources['./skybox/top.jpg']),
+    negY: new Texture2D(loader.resources['./skybox/bottom.jpg']),
+    posZ: new Texture2D(loader.resources['./skybox/front.jpg']),
+    negZ: new Texture2D(loader.resources['./skybox/back.jpg']),
+  }
+  const skyBoxTransform = new Scene.Transform([new Scene.SkyBox([new Scene.Mesh(Cute())], new Scene.Uniforms(skyboxTexture))]);
+  skyBoxTransform.wordMatrix = new Matrix4().makeScale(0.5, 0.5, 0.5)
   const skyBoxMaterial = new Scene.Material(skyBoxProgram, new Scene.Uniforms({}), [skyBoxTransform])
   return skyBoxMaterial;
 }
 
 const prepareScene = () => {
-  globalUniform['texture'] = new Texture2D(loader.resources['texture.png']);
-  globalUniform['normal'] = new Texture2D(loader.resources['wall_normal_map.png']);
   cameraController = new CameraController(inputHandler, camera);
-
   const wallMaterial = makeSkyBox()
-
   const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
   camera.append(gUniform);
   graph.append(camera);

@@ -9,15 +9,15 @@ import { calcPhongLight } from '../base/light';
  */
 const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: Object, gl_position: Vector4) => {
   const { position, normal, texcoord } = attribute;
-  const { modelView, projection } = uniforms;
+  const { model, projection } = uniforms;
   // 世界坐标
   const vWorldPosition = new Vector4().copy(position);
   // 法线
   const vNormal = new Vector3(normal.x, normal.y, normal.z);
   // 标准投影空间的坐标
-  const normalMatrix = new Matrix3().setFromMatrix4(modelView).invert().transpose();
+  const normalMatrix = new Matrix3().setFromMatrix4(model).invert().transpose();
   vNormal.applyMatrix3(normalMatrix).normalize();
-  vWorldPosition.applyMatrix4(modelView as Matrix4);
+  vWorldPosition.applyMatrix4(model as Matrix4);
   gl_position.copy(vWorldPosition).applyMatrix4(projection as Matrix4);
   // 传递给片元着色器的参数
   varyings['vNormal'] = vNormal;
