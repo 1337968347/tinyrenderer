@@ -64,7 +64,7 @@ const perspectiveDivide = (v: Vertex_t) => {
   v.pos.y = v.pos.y * rhw;
   v.pos.z = v.pos.z * rhw;
   v.rhw = rhw;
-  v.pos.w = 1.0;
+  
 }
 
 // 归一化，得到屏幕坐标

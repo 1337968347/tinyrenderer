@@ -15,13 +15,13 @@ const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
   z.x = interp(x1.x, x2.x, t);
   z.y = interp(x1.y, x2.y, t);
   z.z = interp(x1.z, x2.z, t);
-  z.w = 1.0;
+  z.w = 1;
 };
 
 // 顶点插值
 const vertex_Interp = (z: Vertex_t, x1: Vertex_t, x2: Vertex_t, t: number) => {
   vector_Interp(z.pos, x1.pos, x2.pos, t);
-  const t1 = intensityS2W(t, x1.pos, x2.pos);
+  const t1 = intensityS2W(t, x1, x2);
   for (let key in x1.varying) {
     z.varying[key] = new Vector4();
     vector_Interp(z.varying[key], x1.varying[key], x2.varying[key], t1);
@@ -152,12 +152,12 @@ const trapezoid_Init_Triangle = (p1: Vertex_t, p2: Vertex_t, p3: Vertex_t) => {
  * @param p2
  * @returns 校正后的插值系数
  */
-const intensityS2W = (vt: number, p1: Vector4, p2: Vector4) => {
-  // return vt;
-  if (p1.z === p2.z) {
-    return vt;
-  }
-  return (vt * p1.z) / (vt * p1.z + (1 - vt) * p2.z);
+const intensityS2W = (t: number, p1: Vertex_t, p2: Vertex_t) => {
+  if (p2.pos.w === p1.pos.w) { return t }
+  const oneOverW = (1 - t) * p1.rhw + t * p2.rhw;
+  // 使用 s = (w-w0)/(w1-w0)，计算透视修正插值系数。
+  const w = 1 / oneOverW;
+  return (w - p1.pos.w) / (p2.pos.w - p1.pos.w);
 };
 
 /**

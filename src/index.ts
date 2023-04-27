@@ -96,7 +96,7 @@ const makeSkyBox = () => {
     negZ: new Texture2D(loader.resources['./skybox/back.jpg']),
   }
   const skyBoxTransform = new Scene.Transform([new Scene.SkyBox([new Scene.Mesh(Cute())], new Scene.Uniforms(skyboxTexture))]);
-  skyBoxTransform.wordMatrix = new Matrix4().makeScale(0.5, 0.5, 0.5)
+  skyBoxTransform.wordMatrix = new Matrix4().makeScale(1, 1, 1)
   const skyBoxMaterial = new Scene.Material(skyBoxProgram, new Scene.Uniforms({}), [skyBoxTransform])
   return skyBoxMaterial;
 }
