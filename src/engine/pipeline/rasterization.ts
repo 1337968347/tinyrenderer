@@ -15,7 +15,7 @@ const vector_Interp = (z: Vector4, x1: Vector4, x2: Vector4, t: number) => {
   z.x = interp(x1.x, x2.x, t);
   z.y = interp(x1.y, x2.y, t);
   z.z = interp(x1.z, x2.z, t);
-  z.w = 1;
+  z.w = interp(x1.w, x2.w, t);
 };
 
 // 顶点插值

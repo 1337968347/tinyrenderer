@@ -43,7 +43,7 @@ const fragShader = (
     let u = 0;
     let v = 0;
     let weight = 1;
-    let texture: Texture2D;
+    let texture: Texture2D = posX;
     if (aX > aY && aX > aZ) {
         if (x > 0) {
             // 正X面
@@ -75,7 +75,7 @@ const fragShader = (
             // 正Z面
             u = x;
             v = -y;
-            texture = negZ ;
+            texture = negZ;
         } else {
             // 负Z面
             u = -x;
