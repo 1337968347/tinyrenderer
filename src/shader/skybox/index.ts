@@ -13,7 +13,7 @@ const vertShader = (
     gl_position: Vector4
 ) => {
     const { position, texcoord } = attribute;
-    const { model, view, projection } = uniforms;
+    const { model, projection } = uniforms;
     // 世界坐标
     const vWorldPosition = new Vector4().copy(position);
     vWorldPosition.applyMatrix4(model as Matrix4);
@@ -30,6 +30,7 @@ const fragShader = (
 ) => {
     const { posX, posY, posZ, negX, negY, negZ } = uniforms;
     const { varying } = frag;
+    const { uv } = varying
     const vWorldPosition = new Vector3(
         varying.vWorldPosition.x,
         varying.vWorldPosition.y,
@@ -88,7 +89,7 @@ const fragShader = (
     u = (u / weight + 1) / 2;
     v = (v / weight + 1) / 2;
 
-    const color = texture.getUV(u, v);
+    const color = texture.getUV(uv.x, uv.y);
 
     gl_FragColor.x = color.x;
     gl_FragColor.y = color.y;
