@@ -89,7 +89,7 @@ const fragShader = (
     u = (u / weight + 1) / 2;
     v = (v / weight + 1) / 2;
 
-    const color = texture.getUV(uv.x, uv.y);
+    const color = texture.getUV(u, v);
 
     gl_FragColor.x = color.x;
     gl_FragColor.y = color.y;
