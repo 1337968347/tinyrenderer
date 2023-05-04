@@ -1,6 +1,7 @@
 import { Vector4 } from "three"
 
 export const Cute = () => {
+    // 天空盒的顶点数据 平面的正方向朝里
     const position = [
         // 正 X 面
         new Vector4(1, -1, -1, 1.0),

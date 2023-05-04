@@ -24,11 +24,6 @@ const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => 
       continue;
     }
 
-    // 透视除法
-    perspectiveDivide(verts[i]);
-    perspectiveDivide(verts[i + 1]);
-    perspectiveDivide(verts[i + 2]);
-
     // 背面剔除
     if (!check_BackCull(verts, i)) {
       continue
@@ -49,6 +44,7 @@ const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => 
 const transform_check_cvv = (v: Vector4) => {
   const w = v.w;
   let check = 0;
+  // z 是0 - +oo
   if (v.z < 0) check |= 1;
   if (v.z > w) check |= 2;
   if (v.x < -w) check |= 4;
@@ -58,20 +54,13 @@ const transform_check_cvv = (v: Vector4) => {
   return check === 0;
 };
 
-const perspectiveDivide = (v: Vertex_t) => {
+const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
   const rhw = 1.0 / v.pos.w;
-  v.pos.x = v.pos.x * rhw;
-  v.pos.y = v.pos.y * rhw;
+  v.pos.x = (v.pos.x * rhw + 1.0) * width * 0.5;
+  v.pos.y = (1.0 - (v.pos.y * rhw)) * height * 0.5;
   v.pos.z = v.pos.z * rhw;
   v.rhw = rhw;
-  
 }
-
-// 归一化，得到屏幕坐标
-const transform_homogenize = (v: Vertex_t, width: number, height: number) => {
-  v.pos.x = (v.pos.x + 1.0) * width * 0.5;
-  v.pos.y = (1.0 - v.pos.y) * height * 0.5;
-};
 
 // 背面剔除
 const backCull = (a: Vector4, b: Vector4, c: Vector4) => {

@@ -101,7 +101,7 @@ export class Graph {
   }
 
   clear() {
-    this.zBuffer.fill(-Infinity);
+    this.zBuffer.fill(0);
     this.frameBufferData.data.fill(0);
   }
 }
@@ -170,7 +170,7 @@ export class Camera extends SceneNode {
   // 透视投影 远截面
   far: number = 1000;
   // 透视投影 视野范围
-  fov: number = 50;
+  fov: number = 80;
   // 相机视野左右跟上下的比例
   aspect: number = 1;
   position: Vector3;
@@ -197,7 +197,7 @@ export class Camera extends SceneNode {
 
   project(point: Vector4) {
     const mvp = new Matrix4().multiplyMatrices(this.perspective(), this.getWorldView());
-    const p = new Vector4(point.x, point.y, point.z, point.w).applyMatrix4(mvp);
+    const p = point.applyMatrix4(mvp);
     // 透视除法
     p.multiplyScalar(1 / p.w);
     return p;
