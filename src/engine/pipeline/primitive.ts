@@ -24,15 +24,15 @@ const primitivePipeline = (verts: Vertex_t[], width: number, height: number) => 
       continue;
     }
 
+    // 屏幕空间 
+    transform_homogenize(verts[i], width, height);
+    transform_homogenize(verts[i + 1], width, height);
+    transform_homogenize(verts[i + 2], width, height);
     // 背面剔除
     if (!check_BackCull(verts, i)) {
       continue
     }
 
-    // 屏幕空间 
-    transform_homogenize(verts[i], width, height);
-    transform_homogenize(verts[i + 1], width, height);
-    transform_homogenize(verts[i + 2], width, height);
 
     cropVerts.push(verts[i]);
     cropVerts.push(verts[i + 1]);

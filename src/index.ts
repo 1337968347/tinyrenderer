@@ -66,24 +66,24 @@ loader.load(['texture.png', 'wall_normal_map.png', ...skyboxTex]);
 // }
 
 
-const makeWall = () => {
-  const wallLightMaterial: PhongLightMaterial = {
-    // 反射的环境光强度
-    ambientStrength: 0.2,
-    // 反射的漫反射光强度 Lambert
-    diffuseStrength: 0.5,
-    // 反射的镜面反射光强度
-    specularStrength: 5,
-    // 值越大，表面越平滑
-    shininess: 50,
-  };
-  const wallProgram = new ShaderProgram(WallShader);
-  let wallTransform: Scene.Transform;
-  wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
-  wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
-  const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial, normal: new Texture2D(loader.resources['wall_normal_map.png']) }), [wallTransform]);
-  return wallMaterial;
-}
+// const makeWall = () => {
+//   const wallLightMaterial: PhongLightMaterial = {
+//     // 反射的环境光强度
+//     ambientStrength: 0.2,
+//     // 反射的漫反射光强度 Lambert
+//     diffuseStrength: 0.5,
+//     // 反射的镜面反射光强度
+//     specularStrength: 5,
+//     // 值越大，表面越平滑
+//     shininess: 50,
+//   };
+//   const wallProgram = new ShaderProgram(WallShader);
+//   let wallTransform: Scene.Transform;
+//   wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
+//   wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
+//   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial, normal: new Texture2D(loader.resources['wall_normal_map.png']) }), [wallTransform]);
+//   return wallMaterial;
+// }
 
 const makeSkyBox = () => {
   const skyBoxProgram = new ShaderProgram(SkyBoxShader);
