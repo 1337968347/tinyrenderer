@@ -1,9 +1,10 @@
 import { Matrix4, Vector3, Vector4 } from 'three';
 import { african_head } from './assets/african-head';
-import { Scene, ShaderProgram, Utils, Control, Geometry } from './engine';
+import { Scene, ShaderProgram, Utils, Control, } from './engine';
 import * as BlackShader from './shader/black';
 import * as WallShader from './shader/wall';
 import * as SkyBoxShader from "./shader/skybox";
+import * as RayTraceShader from "./shader/raytrace"
 
 import { Texture2D } from './engine/geometry/texture';
 import Loader from './engine/utils/loader';
@@ -79,7 +80,7 @@ const makeWall = () => {
   const wallProgram = new ShaderProgram(WallShader);
   let wallTransform: Scene.Transform;
   wallTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
-  wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
+  // wallTransform.wordMatrix = new Matrix4().makeScale(4, 4, 4)
   const wallMaterial = new Scene.Material(wallProgram, new Scene.Uniforms({ wallLightMaterial, normal: new Texture2D(loader.resources['wall_normal_map.png']) }), [wallTransform]);
   return wallMaterial;
 }
@@ -100,16 +101,32 @@ const makeSkyBox = () => {
   return skyBoxMaterial;
 }
 
+const makeRayTrace = () => {
+  const { position, normal, texcoord } = parseObj(african_head);
+  const positions: Vector4[] = [];
+  const texcoords: Vector4[] = [];
+  const normals: Vector4[] = [];
+  for (let i = 0; i < position.length; i += 3) {
+    positions.push(new Vector4(position[i], position[i + 1], position[i + 2], 1));
+    texcoords.push(new Vector4(texcoord[i], texcoord[i + 1], 0, 1.0));
+    normals.push(new Vector4(normal[i], normal[i + 1], normal[i + 2], 1));
+  }
+
+  const rayTraceUniform = { position: positions, texcoord: texcoords, normal: normals }
+
+  const screenMesh = new Scene.Mesh(screen_quad())
+  const rayTrace = new Scene.Material(new ShaderProgram(RayTraceShader), new Scene.Uniforms(rayTraceUniform), [screenMesh])
+  return rayTrace;
+}
+
 const prepareScene = () => {
   cameraController = new CameraController(inputHandler, camera);
-  const wallMaterial = makeBlack()
-  const gUniform = new Scene.Uniforms(globalUniform, [wallMaterial]);
+  const autoMaterial = makeRayTrace()
+  const gUniform = new Scene.Uniforms(globalUniform, [autoMaterial]);
   camera.append(gUniform);
   graph.append(camera);
-
   camera.position.set(0, 0, 0);
 };
-
 
 let cacheStr = ''
 const tick = (_time: number) => {

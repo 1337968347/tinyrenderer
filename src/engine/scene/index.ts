@@ -265,3 +265,18 @@ export class SkyBox extends SceneNode {
     this.uniforms.exit(graph)
   }
 }
+
+
+export class RayTrace extends SceneNode {
+  constructor(children: SceneNode[] = []) {
+    super(children)
+  }
+
+  enter(_graph: Graph): void {
+
+  }
+
+  exit(_graph: Graph): void {
+
+  }
+}
