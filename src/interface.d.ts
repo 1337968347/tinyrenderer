@@ -17,8 +17,7 @@ declare global {
 
   type rasterizationPipelineProps = {
     verts: Vertex_t[];
-    zBuffer: Float32Array;
-    imageData: ImageData;
+    frameBufferData: FrameBufferData;
     fragShader: FragShader;
     uniforms: uniformsProp;
   };
@@ -70,6 +69,14 @@ declare global {
     y: number;
     w: number;
   };
+
+  // 帧缓冲数据
+  type FrameBufferData = {
+    color: ImageData;
+    zBuffer: Float32Array;
+    // 模板测试
+    stencil?: Uint8ClampedArray;
+  }
 
   // phong 模型中的简单光照
   // 点光源

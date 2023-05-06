@@ -201,8 +201,8 @@ const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: nu
  * @param uniforms
  * @param fragShader
  */
-const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
-  const { width, data } = imageData;
+const device_draw_scanline = (frameBufferData: FrameBufferData, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
+  const { width, data } = frameBufferData.color;
   let { x, w } = scanline;
   let gl_FragColor = new Vector4();
   // 下标偏移
@@ -210,8 +210,8 @@ const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanl
   for (; w > 0; x++, w--) {
     if (x > 0 && x < width) {
       const offset = idx + x;
-      if (scanline.v.rhw > zBuffer[offset]) {
-        zBuffer[offset] = scanline.v.rhw;
+      if (scanline.v.rhw > frameBufferData.zBuffer[offset]) {
+        frameBufferData.zBuffer[offset] = scanline.v.rhw;
         gl_FragColor = new Vector4();
         fragShader(scanline.v, uniforms, gl_FragColor);
         const idxx = offset << 2;
@@ -234,7 +234,7 @@ const device_draw_scanline = (imageData: ImageData, zBuffer: Float32Array, scanl
  * @param uniforms
  * @param fragShader
  */
-const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoid_t, uniforms: uniformsProp, fragShader: FragShader) => {
+const render_trap = (frameBufferData: FrameBufferData, trap: Trapezoid_t, uniforms: uniformsProp, fragShader: FragShader) => {
   // 扫描线
   const scanline: Scanline_t = {
     x: 0,
@@ -249,11 +249,11 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
   const top = (trap.top + 0.5) | 0;
   const bottom = (trap.bottom + 0.5) | 0;
   for (let i = top; i < bottom; i++) {
-    if (i >= 0 && i < imageData.height) {
+    if (i >= 0 && i < frameBufferData.color.height) {
       // 初始化trap两条边的Vertex
       trapezoid_edge_interp(trap, i + 0.5);
       trapezoid_init_scan_line(trap, scanline, i);
-      device_draw_scanline(imageData, zBuffer, scanline, uniforms, fragShader);
+      device_draw_scanline(frameBufferData, scanline, uniforms, fragShader);
     }
   }
 };
@@ -264,12 +264,12 @@ const render_trap = (imageData: ImageData, zBuffer: Float32Array, trap: Trapezoi
  * @returns
  */
 const rasterizationPipeline = (props: rasterizationPipelineProps) => {
-  const { verts, zBuffer, imageData, fragShader, uniforms } = props;
+  const { verts, frameBufferData, fragShader, uniforms } = props;
   // 每个图元
   for (let i = 0; i < verts.length; i += 3) {
     const traps: Trapezoid_t[] = trapezoid_Init_Triangle(verts[i], verts[i + 1], verts[i + 2]);
     for (let j = 0; j < traps.length; j++) {
-      render_trap(imageData, zBuffer, traps[j], uniforms, fragShader);
+      render_trap(frameBufferData, traps[j], uniforms, fragShader);
     }
   }
 };

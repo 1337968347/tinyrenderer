@@ -37,8 +37,8 @@ export class Graph {
   root: SceneNode = new SceneNode([]);
   canvasEl: HTMLCanvasElement = null;
   ctx: CanvasRenderingContext2D;
-  zBuffer: Float32Array;
-  frameBufferData: ImageData;
+  // 帧缓冲对象
+  frameBufferData: FrameBufferData;
   viewPort: { width: number; height: number } = { width: 0, height: 0 };
 
   constructor(props: GraphProp = { width: 512, height: 512 }) {
@@ -56,8 +56,12 @@ export class Graph {
       this.viewPort.width = width || 512;
       this.viewPort.height = height || 512;
     }
-    this.zBuffer = new Float32Array(this.viewPort.width * this.viewPort.height);
-    this.bindFrameBuffer(this.ctx.getImageData(0, 0, this.canvasEl.width, this.canvasEl.height));
+    // 创建帧缓冲对象
+    const frameBufferData: FrameBufferData = {
+      color: this.ctx.getImageData(0, 0, this.canvasEl.width, this.canvasEl.height),
+      zBuffer: new Float32Array(this.viewPort.width * this.viewPort.height)
+    }
+    this.bindFrameBuffer(frameBufferData);
   }
 
   append(node: SceneNode) {
@@ -93,16 +97,18 @@ export class Graph {
     return this.programs[this.programs.length - 1];
   }
 
-  bindFrameBuffer(frameBufferData: ImageData) {
-    if (this.viewPort.width !== frameBufferData.width || this.viewPort.height !== frameBufferData.height) {
+  bindFrameBuffer(frameBufferData: FrameBufferData) {
+    if (this.viewPort.width !== frameBufferData.color.width || this.viewPort.height !== frameBufferData.color.height) {
       throw new Error("frameBufferData 跟当前场景图的宽高不一致");
     }
+
     this.frameBufferData = frameBufferData;
   }
 
   clear() {
-    this.zBuffer.fill(0);
-    this.frameBufferData.data.fill(0);
+    this.frameBufferData.zBuffer.fill(0);
+    this.frameBufferData.color.data.fill(0);
+    this.frameBufferData.stencil?.fill(0)
   }
 }
 
@@ -266,6 +272,22 @@ export class SkyBox extends SceneNode {
   }
 }
 
+// FrameBufferObject
+export class RenderTarget extends SceneNode {
+  fbo: FrameBufferData
+  constructor(fbo: FrameBufferData, children: SceneNode[]) {
+    super(children)
+    this.fbo = fbo;
+  }
+
+  enter(_graph: Graph): void {
+
+  }
+
+  exit(_graph: Graph): void {
+
+  }
+}
 
 export class RayTrace extends SceneNode {
   constructor(children: SceneNode[] = []) {

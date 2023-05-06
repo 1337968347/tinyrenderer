@@ -15,14 +15,13 @@ class ShaderProgram {
   }
 
   draw(attributes: AttributeProps, uniforms: uniformsProp, graph: Scene.Graph) {
-    const { zBuffer, frameBufferData } = graph;
     const { vertShader, fragShader } = this;
     // 顶点着色器
     let verts: Vertex_t[] = vertPipeline({ attributes, uniforms, vertShader });
     // 图元组装
     verts = primitivePipeline(verts, graph.viewPort.width, graph.viewPort.height);
     // 光栅化（图元数据 => 片元数据）
-    rasterizationPipeline({ verts, zBuffer, imageData: frameBufferData, fragShader, uniforms });
+    rasterizationPipeline({ verts, frameBufferData: graph.frameBufferData, fragShader, uniforms });
   }
 }
 

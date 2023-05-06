@@ -39,6 +39,7 @@ const skyboxTex = ['./skybox/top.jpg', './skybox/bottom.jpg', './skybox/front.jp
 
 loader.load(['texture.png', 'wall_normal_map.png', ...skyboxTex]);
 
+// 黑人头
 const makeBlack = () => {
   const { position, normal, texcoord } = parseObj(african_head);
   const positions: Vector4[] = [];
@@ -66,6 +67,7 @@ const makeBlack = () => {
   return blackMaterial;
 }
 
+// 墙
 const makeWall = () => {
   const wallLightMaterial: PhongLightMaterial = {
     // 反射的环境光强度
@@ -85,6 +87,7 @@ const makeWall = () => {
   return wallMaterial;
 }
 
+// 天空盒 TODO
 const makeSkyBox = () => {
   const skyBoxProgram = new ShaderProgram(SkyBoxShader);
   const skyboxTexture = {
@@ -101,6 +104,7 @@ const makeSkyBox = () => {
   return skyBoxMaterial;
 }
 
+// 光线追踪
 const makeRayTrace = () => {
   const { position, normal, texcoord } = parseObj(african_head);
   const positions: Vector4[] = [];
@@ -117,6 +121,13 @@ const makeRayTrace = () => {
   const screenMesh = new Scene.Mesh(screen_quad())
   const rayTrace = new Scene.Material(new ShaderProgram(RayTraceShader), new Scene.Uniforms(rayTraceUniform), [screenMesh])
   return rayTrace;
+}
+
+// 纹理阴影
+const makeShadowMap = () => {
+
+  let groundTransform: Scene.Transform;
+  groundTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
 }
 
 const prepareScene = () => {
