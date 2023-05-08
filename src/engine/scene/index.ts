@@ -37,6 +37,8 @@ export class Graph {
   root: SceneNode = new SceneNode([]);
   canvasEl: HTMLCanvasElement = null;
   ctx: CanvasRenderingContext2D;
+
+  originFrameBufferData: FrameBufferData;
   // 帧缓冲对象
   frameBufferData: FrameBufferData;
   viewPort: { width: number; height: number } = { width: 0, height: 0 };
@@ -61,6 +63,7 @@ export class Graph {
       color: this.ctx.getImageData(0, 0, this.canvasEl.width, this.canvasEl.height),
       zBuffer: new Float32Array(this.viewPort.width * this.viewPort.height)
     }
+    this.originFrameBufferData = frameBufferData;
     this.bindFrameBuffer(frameBufferData);
   }
 
@@ -99,10 +102,16 @@ export class Graph {
 
   bindFrameBuffer(frameBufferData: FrameBufferData) {
     if (this.viewPort.width !== frameBufferData.color.width || this.viewPort.height !== frameBufferData.color.height) {
-      throw new Error("frameBufferData 跟当前场景图的宽高不一致");
+      throw new Error("颜色缓冲区的宽高跟当前场景图的宽高不一致");
     }
-
+    if (this.viewPort.width * this.viewPort.height !== frameBufferData.zBuffer.length) {
+      throw new Error("深度缓冲区的宽高跟当前场景图的宽高不一致");
+    }
     this.frameBufferData = frameBufferData;
+  }
+
+  unbindFrameBuffer() {
+    this.frameBufferData = this.originFrameBufferData;
   }
 
   clear() {
@@ -162,7 +171,7 @@ export class Mesh extends SceneNode {
   enter(graph: Graph): void {
     const program = graph.getProgram();
     program.draw(this.attributes, graph.uniform, graph);
-    graph.ctx.putImageData(graph.frameBufferData, 0, 0);
+    graph.ctx.putImageData(graph.frameBufferData.color, 0, 0);
   }
 }
 
@@ -280,12 +289,12 @@ export class RenderTarget extends SceneNode {
     this.fbo = fbo;
   }
 
-  enter(_graph: Graph): void {
-
+  enter(graph: Graph): void {
+    graph.bindFrameBuffer(this.fbo)
   }
 
-  exit(_graph: Graph): void {
-
+  exit(graph: Graph): void {
+    graph.unbindFrameBuffer();
   }
 }
 
