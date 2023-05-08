@@ -171,7 +171,14 @@ export class Mesh extends SceneNode {
   enter(graph: Graph): void {
     const program = graph.getProgram();
     program.draw(this.attributes, graph.uniform, graph);
-    graph.ctx.putImageData(graph.frameBufferData.color, 0, 0);
+    const zBufferColor = new ImageData(graph.viewPort.width, graph.viewPort.height)
+    for (let i = 0; i < graph.viewPort.height; i++) {
+      for (let j = 0; j < graph.viewPort.width; j++) {
+        const idx = (i * graph.viewPort.width) + j
+        zBufferColor.data[(idx << 2) + 3] = graph.frameBufferData.zBuffer[idx] * 255
+      }
+    }
+    graph.ctx.putImageData(zBufferColor, 0, 0);
   }
 }
 
@@ -284,12 +291,20 @@ export class SkyBox extends SceneNode {
 // FrameBufferObject
 export class RenderTarget extends SceneNode {
   fbo: FrameBufferData
-  constructor(fbo: FrameBufferData, children: SceneNode[]) {
+  constructor(children: SceneNode[]) {
     super(children)
-    this.fbo = fbo;
   }
 
   enter(graph: Graph): void {
+    const { width, height } = graph.viewPort
+    if (!this.fbo || width * height !== this.fbo.zBuffer.length) {
+      // 创建帧缓冲对象
+      const fbo: FrameBufferData = {
+        color: new ImageData(width, height),
+        zBuffer: new Float32Array(width * height)
+      }
+      this.fbo = fbo;
+    }
     graph.bindFrameBuffer(this.fbo)
   }
 

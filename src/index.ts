@@ -126,13 +126,13 @@ const makeRayTrace = () => {
 // 纹理阴影
 const makeShadowMap = () => {
 
-  let groundTransform: Scene.Transform;
-  groundTransform = new Scene.Transform([new Scene.Mesh(screen_quad())])
+  const groundTransform: Scene.Transform = new Scene.Transform([new Scene.Mesh(screen_quad())]);
+  const zBufferFbo = new Scene.RenderTarget([groundTransform])
 }
 
 const prepareScene = () => {
   cameraController = new CameraController(inputHandler, camera);
-  const autoMaterial = makeRayTrace()
+  const autoMaterial = makeBlack()
   const gUniform = new Scene.Uniforms(globalUniform, [autoMaterial]);
   camera.append(gUniform);
   graph.append(camera);
