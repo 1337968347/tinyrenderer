@@ -25,7 +25,7 @@ const vertShader = (attribute: attributeProp, uniforms: uniformsProp, varyings: 
   varyings['uv'] = texcoord;
 };
 
-const fragShader = (frag: Vertex_t, uniforms: uniformsProp, gl_FragColor: Vector4) => {
+const fragShader = (frag: Vertex_t, uniforms: uniformsProp, { gl_FragColor }) => {
   const { light, eye, blackLightMaterial } = uniforms;
   const { varying } = frag;
   let { vNormal, vWorldPosition, uv } = varying;

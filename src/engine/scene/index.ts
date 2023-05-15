@@ -171,14 +171,14 @@ export class Mesh extends SceneNode {
   enter(graph: Graph): void {
     const program = graph.getProgram();
     program.draw(this.attributes, graph.uniform, graph);
-    const zBufferColor = new ImageData(graph.viewPort.width, graph.viewPort.height)
-    for (let i = 0; i < graph.viewPort.height; i++) {
-      for (let j = 0; j < graph.viewPort.width; j++) {
-        const idx = (i * graph.viewPort.width) + j
-        zBufferColor.data[(idx << 2) + 3] = graph.frameBufferData.zBuffer[idx] * 255
-      }
-    }
-    graph.ctx.putImageData(zBufferColor, 0, 0);
+    // const zBufferColor = new ImageData(graph.viewPort.width, graph.viewPort.height)
+    // for (let i = 0; i < graph.viewPort.height; i++) {
+    //   for (let j = 0; j < graph.viewPort.width; j++) {
+    //     const idx = (i * graph.viewPort.width) + j
+    //     zBufferColor.data[(idx << 2) + 3] = graph.frameBufferData.zBuffer[idx] * 255
+    //   }
+    // }
+    graph.ctx.putImageData(graph.frameBufferData.color, 0, 0);
   }
 }
 

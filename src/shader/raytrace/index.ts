@@ -1,4 +1,4 @@
-import { Vector4 } from "three";
+import { Vector3, Vector4 } from "three";
 
 /**
  * 顶点变换 着色器
@@ -15,12 +15,25 @@ const vertShader = (
     gl_position.copy(position);
 };
 
-const fragShader = (
+
+const fragShader: FragShader = (
     _frag: Vertex_t,
-    _uniforms: uniformsProp,
-    gl_FragColor: Vector4
+    uniforms: uniformsProp,
+    fragContext
 ) => {
-    // const { position, texcoord, normal } = uniforms;
+    const { gl_FragColor, fragCoord, iResolution } = fragContext
+    const { projection } = uniforms;
+
+
+    const ro = new Vector3(0, 0, 0).applyMatrix4(projection)
+    const rp = new Vector3(fragCoord.x / iResolution.x - 0.5, fragCoord.y / iResolution.y - 0.5, -1.0).applyMatrix4(projection)
+    const rd = new Vector3().subVectors(rp, ro);
+
+    const sphere = {
+        
+    }
+
+
 
     gl_FragColor.x = 220;
     gl_FragColor.y = 255;

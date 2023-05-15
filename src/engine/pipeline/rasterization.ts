@@ -202,9 +202,11 @@ const trapezoid_init_scan_line = (trap: Trapezoid_t, scanline: Scanline_t, y: nu
  * @param fragShader
  */
 const device_draw_scanline = (frameBufferData: FrameBufferData, scanline: Scanline_t, uniforms: uniformsProp, fragShader: FragShader) => {
-  const { width, data } = frameBufferData.color;
+  const { width, data, height } = frameBufferData.color;
   let { x, w } = scanline;
   let gl_FragColor = new Vector4();
+  // 分辨率
+  const iResolution = { x: width, y: height }
   // 下标偏移
   const idx = (scanline.y | 0) * width;
   for (; w > 0; x++, w--) {
@@ -213,7 +215,9 @@ const device_draw_scanline = (frameBufferData: FrameBufferData, scanline: Scanli
       if (scanline.v.rhw > frameBufferData.zBuffer[offset]) {
         frameBufferData.zBuffer[offset] = scanline.v.rhw;
         gl_FragColor = new Vector4();
-        fragShader(scanline.v, uniforms, gl_FragColor);
+        // 当前像素位置
+        const fragCoord = { x, y: scanline.y };
+        fragShader(scanline.v, uniforms, { fragCoord, iResolution, gl_FragColor, });
         const idxx = offset << 2;
         data[idxx] = gl_FragColor.x;
         data[idxx + 1] = gl_FragColor.y;

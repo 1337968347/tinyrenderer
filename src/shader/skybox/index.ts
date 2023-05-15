@@ -26,7 +26,7 @@ const vertShader = (
 const fragShader = (
     frag: Vertex_t,
     uniforms: uniformsProp,
-    gl_FragColor: Vector4
+    { gl_FragColor }
 ) => {
     const { posX, posY, posZ, negX, negY, negZ } = uniforms;
     const { varying } = frag;
@@ -96,4 +96,5 @@ const fragShader = (
     gl_FragColor.z = color.z;
     gl_FragColor.w = 255;
 };
+
 export { vertShader, fragShader };

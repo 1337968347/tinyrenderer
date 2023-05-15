@@ -30,8 +30,8 @@ let camera: Scene.Camera = new Scene.Camera();
 const canvasEl = document.querySelector('canvas');
 const fpsEl = document.querySelector('#fps');
 const loader = new Loader('./assets/');
-canvasEl.width = 256;
-canvasEl.height = 256;
+canvasEl.width = 500;
+canvasEl.height = 500;
 let graph = new Scene.Graph({ canvasEl });
 let inputHandler = new InputHandler(canvasEl);
 
@@ -63,6 +63,7 @@ const makeBlack = () => {
   let blackTransform: Scene.Transform;
   const blackProgram = new ShaderProgram(BlackShader);
   blackTransform = new Scene.Transform([new Scene.Mesh({ position: positions, texcoord: texcoords, normal: normals })]);
+  blackTransform.wordMatrix = new Matrix4().makeScale(1, -1, 1)
   const blackMaterial = new Scene.Material(blackProgram, new Scene.Uniforms({ blackLightMaterial, texture: new Texture2D(loader.resources['texture.png']) }), [blackTransform]);
   return blackMaterial;
 }
@@ -106,20 +107,20 @@ const makeSkyBox = () => {
 
 // 光线追踪
 const makeRayTrace = () => {
-  const { position, normal, texcoord } = parseObj(african_head);
-  const positions: Vector4[] = [];
-  const texcoords: Vector4[] = [];
-  const normals: Vector4[] = [];
-  for (let i = 0; i < position.length; i += 3) {
-    positions.push(new Vector4(position[i], position[i + 1], position[i + 2], 1));
-    texcoords.push(new Vector4(texcoord[i], texcoord[i + 1], 0, 1.0));
-    normals.push(new Vector4(normal[i], normal[i + 1], normal[i + 2], 1));
-  }
+  // const { position, normal, texcoord } = parseObj(african_head);
+  // const positions: Vector4[] = [];
+  // const texcoords: Vector4[] = [];
+  // const normals: Vector4[] = [];
+  // for (let i = 0; i < position.length; i += 3) {
+  //   positions.push(new Vector4(position[i], position[i + 1], position[i + 2], 1));
+  //   texcoords.push(new Vector4(texcoord[i], texcoord[i + 1], 0, 1.0));
+  //   normals.push(new Vector4(normal[i], normal[i + 1], normal[i + 2], 1));
+  // }
 
-  const rayTraceUniform = { position: positions, texcoord: texcoords, normal: normals }
+  // const rayTraceUniform = { position: positions, texcoord: texcoords, normal: normals }
 
   const screenMesh = new Scene.Mesh(screen_quad())
-  const rayTrace = new Scene.Material(new ShaderProgram(RayTraceShader), new Scene.Uniforms(rayTraceUniform), [screenMesh])
+  const rayTrace = new Scene.Material(new ShaderProgram(RayTraceShader), new Scene.Uniforms({}), [screenMesh])
   return rayTrace;
 }
 
@@ -132,7 +133,7 @@ const makeShadowMap = () => {
 
 const prepareScene = () => {
   cameraController = new CameraController(inputHandler, camera);
-  const autoMaterial = makeBlack()
+  const autoMaterial = makeRayTrace()
   const gUniform = new Scene.Uniforms(globalUniform, [autoMaterial]);
   camera.append(gUniform);
   graph.append(camera);
