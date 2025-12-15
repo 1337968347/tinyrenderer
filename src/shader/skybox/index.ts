@@ -1,4 +1,4 @@
-import { Matrix4, Matrix3, Vector3, Vector4 } from "three";
+import { Matrix4, Vector3, Vector4 } from 'three';
 import { Texture2D } from "../../engine/geometry/texture";
 
 /**
@@ -30,7 +30,6 @@ const fragShader = (
 ) => {
     const { posX, posY, posZ, negX, negY, negZ } = uniforms;
     const { varying } = frag;
-    const { uv } = varying
     const vWorldPosition = new Vector3(
         varying.vWorldPosition.x,
         varying.vWorldPosition.y,

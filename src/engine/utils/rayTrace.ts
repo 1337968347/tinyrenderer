@@ -1,9 +1,9 @@
 import { Vector3 } from "three";
 
 class Thing {
-    intersect(ray: Vector3) { }
+    intersect(_ray: Vector3) { }
 
-    normal(pos: Vector3) { }
+    normal(_pos: Vector3) { }
 }
 
 

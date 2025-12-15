@@ -1,7 +1,7 @@
 class Clock {
   isRunning: boolean = false;
   nowT: number;
-  timeId: NodeJS.Timeout | null = null;
+  timeId = null;
   onTick: TickFunc;
   flushNum: number = 0;
   fps: number = 0;
